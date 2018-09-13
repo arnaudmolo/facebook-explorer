@@ -7,6 +7,9 @@
 import React from 'react';
 import request from 'utils/request';
 import ConversationTitle from 'components/ConversationTitle';
+import PieChart from 'components/PieChart';
+import { ListGroup, ListGroupItem } from 'reactstrap';
+import './styles.css';
 
 // import PropTypes from 'prop-types';
 // import styled from 'styled-components';
@@ -28,13 +31,26 @@ class Widget extends React.PureComponent {
   render() {
     const { threads } = this.state;
     return (
-      <div>
-        {threads.map(thread => (
-          <div key={thread.thread_path}>
-            <ConversationTitle>{thread.title}</ConversationTitle>
-            {thread.meta.mine} / {thread.meta.total}
-          </div>
-        ))}
+      <div className="widget-container">
+        <p>Threads with the most messages</p>
+        <ListGroup>
+          {threads.map(thread => (
+            <ListGroupItem
+              className="widget-group-item"
+              key={thread.thread_path}
+            >
+              <ConversationTitle>{thread.title}</ConversationTitle>
+              <PieChart
+                width={20}
+                height={20}
+                values={[
+                  thread.meta.mine,
+                  thread.meta.total - thread.meta.mine,
+                ]}
+              />
+            </ListGroupItem>
+          ))}
+        </ListGroup>
       </div>
     );
   }

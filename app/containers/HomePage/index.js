@@ -19,10 +19,10 @@ import messages from './messages';
 export default class HomePage extends React.PureComponent {
   render() {
     return (
-      <h1>
+      <div>
         <Widget />
         <FormattedMessage {...messages.header} />
-      </h1>
+      </div>
     );
   }
 }

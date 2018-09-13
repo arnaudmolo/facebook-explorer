@@ -11,14 +11,18 @@ import './styles.css';
 function ConversationTitle(props) {
   return (
     <div className="conversation-title">
-      <p>{props.loading ? 'Loading...' : props.children}</p>
+      <p>
+        {props.loading
+          ? 'Loading...'
+          : decodeURIComponent(escape(props.children))}
+      </p>
     </div>
   );
 }
 
 ConversationTitle.propTypes = {
   loading: PropTypes.bool,
-  children: PropTypes.element,
+  children: PropTypes.any,
 };
 
 export default ConversationTitle;

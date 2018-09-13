@@ -1,0 +1,17 @@
+.widget-group-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.45rem;
+}
+
+.widget-container {
+    position: relative;
+    padding: 1em;
+    border: 1px solid #d8d8d8;
+    margin: 1.5rem 0 0;
+}
+
+body, p, label {
+    font-family: "Helvetica Neue";
+}
