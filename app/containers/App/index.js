@@ -16,16 +16,23 @@ import { Switch, Route } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
-import Users from 'containers/Users/Loadable';
+import Users from 'containers/Users';
+import Sidebar from 'components/Sidebar';
+import { compose, branch, renderNothing } from 'recompose';
 
-export default function App() {
-  return (
-    <div>
+import './styles.css';
+
+export default compose(
+  Users,
+  branch(props => !props.own, renderNothing),
+)(props => (
+  <div className="wrapper">
+    <Sidebar title={props.own.name} />
+    <div className="content">
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route component={NotFoundPage} />
       </Switch>
-      <Users />
     </div>
-  );
-}
+  </div>
+));
