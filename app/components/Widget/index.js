@@ -9,30 +9,28 @@ import request from 'utils/request';
 import ConversationTitle from 'components/ConversationTitle';
 import PieChart from 'components/PieChart';
 import { ListGroup, ListGroupItem } from 'reactstrap';
+import PropTypes from 'prop-types';
+import { lifecycle, withState, compose } from 'recompose';
 import './styles.css';
 
-// import PropTypes from 'prop-types';
 // import styled from 'styled-components';
+
+const withAsync = compose(
+  withState('threads', 'setThreads', koi => console.log('koi', koi) || []),
+  lifecycle({
+    async componentWillMount() {
+      this.props.setThreads(await request(this.props.url));
+    },
+  }),
+);
 
 /* eslint-disable react/prefer-stateless-function */
 class Widget extends React.PureComponent {
-  state = {
-    threads: [],
-  };
-  async componentWillMount() {
-    try {
-      this.setState({
-        threads: await request('//localhost:5002/threads?count=10'),
-      });
-    } catch (error) {
-      throw error;
-    }
-  }
-  render() {
-    const { threads } = this.state;
+  render(props = this.props) {
+    const { threads } = props;
     return (
       <div className="widget-container">
-        <p>Threads with the most messages</p>
+        <p>{this.props.title}</p>
         <ListGroup>
           {threads.map(thread => (
             <ListGroupItem
@@ -40,14 +38,16 @@ class Widget extends React.PureComponent {
               key={thread.thread_path}
             >
               <ConversationTitle>{thread.title}</ConversationTitle>
-              <PieChart
-                width={20}
-                height={20}
-                values={[
-                  thread.meta.mine,
-                  thread.meta.total - thread.meta.mine,
-                ]}
-              />
+              {props.meta && (
+                <PieChart
+                  width={20}
+                  height={20}
+                  values={[
+                    thread.meta.mine,
+                    thread.meta.total - thread.meta.mine,
+                  ]}
+                />
+              )}
             </ListGroupItem>
           ))}
         </ListGroup>
@@ -56,6 +56,8 @@ class Widget extends React.PureComponent {
   }
 }
 
-Widget.propTypes = {};
+Widget.propTypes = {
+  title: PropTypes.string,
+};
 
-export default Widget;
+export default withAsync(Widget);
