@@ -21,3 +21,4 @@ npm-debug.log
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+__pycache__

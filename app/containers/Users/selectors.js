@@ -16,16 +16,13 @@ const selectUsersDomain = state => state.get('users', initialState);
  * Default selector used by Users
  */
 
+const friendship = user => user.friendship;
+
 const makeSelectUsers = () =>
   createSelector(selectUsersDomain, substate => substate.get('users'));
 
 const makeSelectOwnUser = () =>
-  createSelector(
-    makeSelectUsers(),
-    find(user =>
-      user.Relations.some(relation => relation.friendship === 'own'),
-    ),
-  );
+  createSelector(makeSelectUsers(), find(user => friendship(user) === 'own'));
 
 export default makeSelectUsers;
 export { selectUsersDomain, makeSelectOwnUser };
