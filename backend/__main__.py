@@ -114,13 +114,37 @@ class User(Resource):
         # res = []
         # for row in cursor.fetchall():
         #     print(row)
-        res = cursor.fetchall()
-        print(len(res))
         # print(res)
-        sorted_input = sorted(res, key=itemgetter(2))
+        all = cursor.fetchall()
+        thread_id_accessor = itemgetter(2)
         final_threads = []
-        for thread_id, grouped_thread in groupby(sorted_input, key=itemgetter(2)):
-            t2 = list(v for v in grouped_thread)
+
+        def countby(f, seq):
+            result = {}
+            for value in seq: 
+                key = f(value)
+                if key in result:
+                    result[key] += 1
+                else: 
+                    result[key] = 1
+            return result
+
+        for thread_id, grouped_threads in groupby(sorted(all, key=thread_id_accessor), key=thread_id_accessor):
+            t2 = list(v for v in grouped_threads)
+            thread_messages = [ (message_id, threads_id, message_content, message_date.isoformat(), message_user_id) for (
+                users_id,
+                users_name,
+                threads_id,
+                threads_title,
+                threads_is_still_participant,
+                threads_status,
+                threads_thread_type,
+                threads_thread_path,
+                message_id,
+                message_content,
+                message_date,
+                message_user_id
+            ) in sorted(t2, key=lambda t: t[10]) ]
             final_threads.append(
                 (
                     thread_id,
@@ -129,13 +153,19 @@ class User(Resource):
                     t2[0][5],
                     t2[0][6],
                     t2[0][7],
+                    countby(itemgetter(4), thread_messages),
+                    thread_messages
                 )
             )
-        return [
-            res[0][0],
-            res[0][1],
+        final_threads = sorted(
             final_threads,
-            [(item[2], item[8], item[9]) for item in res]
+            key=lambda item: len(itemgetter(6)(item)),
+            reverse=True
+        )
+        return [
+            all[0][0],
+            all[0][1],
+            final_threads
         ]
 
 api.add_resource(Threads, '/threads')

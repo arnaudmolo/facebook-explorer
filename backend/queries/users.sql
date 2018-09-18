@@ -51,7 +51,9 @@
         t.thread_type AS threads_thread_type,
         t.thread_path AS threads_thread_path,
         messages.id,
-        messages.content
+        messages.content,
+        messages.timestamp,
+        messages.UserId
     FROM userthread
         INNER JOIN threads as t on t.id = `userthread`.`ThreadId`
         INNER JOIN users as u on u.id = `userthread`.`UserId`

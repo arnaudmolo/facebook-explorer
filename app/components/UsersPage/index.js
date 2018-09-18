@@ -9,8 +9,9 @@ import Users from 'containers/Users';
 import fuzzyFilterFactory from 'react-fuzzy-filter';
 import PropTypes from 'prop-types';
 import { scaleOrdinal } from 'd3';
-// import styled from 'styled-components';
+
 import { Container, Row, Col, FormGroup, Label, Input, Form } from 'reactstrap';
+import User from './User';
 
 const { InputFilter, FilterResults } = fuzzyFilterFactory();
 
@@ -40,6 +41,7 @@ class UsersPage extends React.PureComponent {
 
   state = {
     checkedStatus: friendshipStatus.filter(e => e === 'friend' || e === 'own'),
+    user: {},
   };
 
   onChange = event => {
@@ -55,11 +57,16 @@ class UsersPage extends React.PureComponent {
     });
   };
 
-  getInfos = user => () => {
+  selectUser = user => () => {
     this.props.requestUser(user.id);
+    this.setState({ user });
   };
 
   render() {
+    const selected =
+      this.state.user.id &&
+      this.props.users.find(user => user.id === this.state.user.id);
+    console.log(selected);
     return (
       <Container>
         <Row>
@@ -92,7 +99,7 @@ class UsersPage extends React.PureComponent {
                     <div>
                       {filteredItems.map(item => (
                         <div key={item.id}>
-                          <button onClick={this.getInfos(item)}>
+                          <button onClick={this.selectUser(item)}>
                             {item.name} {scale(item.relation)}
                           </button>
                         </div>
@@ -103,6 +110,7 @@ class UsersPage extends React.PureComponent {
               </div>
             )}
           </Col>
+          <Col>{this.state.user.id && <User user={selected} />}</Col>
         </Row>
       </Container>
     );

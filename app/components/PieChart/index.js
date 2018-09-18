@@ -6,8 +6,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { pie, arc } from 'd3';
+import { pie, arc, scaleOrdinal, schemePaired } from 'd3';
 import './styles.css';
+
+const colorScale = scaleOrdinal(schemePaired);
 
 function PieChart(props) {
   const width = props.width || 50;
@@ -16,8 +18,9 @@ function PieChart(props) {
   return (
     <svg width={width} height={height} className="pie-chart--scene">
       <g transform={`translate(${radius}, ${radius})`}>
-        {pie()(props.values).map(d => (
+        {pie()(Object.values(props.values)).map(d => (
           <path
+            fill={colorScale(Object.keys(props.values)[d.index])}
             key={`${d.value}-${d.index}`}
             d={arc()
               .outerRadius(radius - 1)
@@ -32,7 +35,7 @@ function PieChart(props) {
 PieChart.propTypes = {
   height: PropTypes.number,
   width: PropTypes.number,
-  values: PropTypes.arrayOf(PropTypes.number),
+  values: PropTypes.any,
 };
 
 export default PieChart;

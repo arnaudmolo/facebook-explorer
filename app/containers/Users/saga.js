@@ -30,19 +30,28 @@ export function* getUser(action) {
         compose(
           user => ({
             ...user,
-            messages: user.messages.map(zipObj(['thread', 'message'])),
             threads: user.threads.map(
-              zipObj([
-                'id',
-                'title',
-                'is_still_participant',
-                'status',
-                'thread_type',
-                'thread_path',
-              ]),
+              compose(
+                thread => ({
+                  ...thread,
+                  messages: thread.messages.map(
+                    zipObj(['id', 'thread', 'message', 'date', 'user']),
+                  ),
+                }),
+                zipObj([
+                  'id',
+                  'title',
+                  'is_still_participant',
+                  'status',
+                  'thread_type',
+                  'thread_path',
+                  'meta',
+                  'messages',
+                ]),
+              ),
             ),
           }),
-          zipObj(['id', 'name', 'threads', 'messages']),
+          zipObj(['id', 'name', 'threads']),
         )(yield call(request, requestURL)),
       ),
     );
