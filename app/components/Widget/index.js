@@ -8,7 +8,7 @@ import React from 'react';
 import request from 'utils/request';
 import ConversationTitle from 'components/ConversationTitle';
 import PieChart from 'components/PieChart';
-import { ListGroup, ListGroupItem } from 'reactstrap';
+import { ListGroup, ListGroupItem, Col } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { lifecycle, withState, compose } from 'recompose';
 import { zipObj, map } from 'ramda';
@@ -39,10 +39,9 @@ const withAsync = compose(
 class Widget extends React.PureComponent {
   render(props = this.props) {
     const { threads } = props;
-    console.log(threads);
     return (
-      <div className="widget-container">
-        <p>{this.props.title}</p>
+      <Col>
+        <h2>{this.props.title}</h2>
         <ListGroup>
           {threads.map(thread => (
             <ListGroupItem
@@ -60,7 +59,7 @@ class Widget extends React.PureComponent {
             </ListGroupItem>
           ))}
         </ListGroup>
-      </div>
+      </Col>
     );
   }
 }

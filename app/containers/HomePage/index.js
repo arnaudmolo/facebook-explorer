@@ -10,26 +10,35 @@
  */
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import Widget from 'components/Widget';
-
-import messages from './messages';
+import { Jumbotron, Container, Row } from 'reactstrap';
+import './styles.css';
 
 /* eslint-disable react/prefer-stateless-function */
 export default class HomePage extends React.PureComponent {
   render() {
     return (
-      <div>
-        <Widget
-          title="Threads with the most messages."
-          url="//localhost:5002/threads?count=10"
-        />
-        <Widget
-          title="Threads I postedin."
-          url="//localhost:5002/threads?count=10&order=own"
-        />
-        <FormattedMessage {...messages.header} />
-      </div>
+      <Container>
+        <Row>
+          <Jumbotron>
+            <h1 className="display-3">Coucou.</h1>
+            <p className="lead">
+              Facebook absorbe beaucoup de données. Essayons de les explorer
+              ensemble :)
+            </p>
+          </Jumbotron>
+        </Row>
+        <Row>
+          <Widget
+            title="Threads with the most messages."
+            url="//localhost:5002/threads?count=10"
+          />
+          <Widget
+            title="Threads I most posted in."
+            url="//localhost:5002/threads?count=10&order=own"
+          />
+        </Row>
+      </Container>
     );
   }
 }

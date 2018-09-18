@@ -18,21 +18,22 @@ import HomePage from 'containers/HomePage';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Users from 'containers/Users';
 import Sidebar from 'components/Sidebar';
-import { compose, branch, renderNothing } from 'recompose';
+import { compose, branch, renderNothing, withProps } from 'recompose';
 
 import './styles.css';
 
-export default compose(
+const Navigation = compose(
   Users,
   branch(props => !props.own, renderNothing),
-)(props => (
+  withProps(props => ({ title: props.own.name })),
+)(Sidebar);
+
+export default () => (
   <div className="wrapper">
-    <Sidebar title={props.own.name} />
-    <div className="content">
-      <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route component={NotFoundPage} />
-      </Switch>
-    </div>
+    <Navigation />
+    <Switch>
+      <Route exact path="/" component={HomePage} />
+      <Route component={NotFoundPage} />
+    </Switch>
   </div>
-));
+);

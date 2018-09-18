@@ -9,7 +9,8 @@
     position: relative;
     padding: 1em;
     border: 1px solid #d8d8d8;
-    margin: 1.5rem 0 0;
+    margin: 1.5rem 1.5rem;
+    max-width: 300px;
 }
 
 body, p, label {
