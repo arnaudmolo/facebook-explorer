@@ -13,12 +13,13 @@
 
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import { compose, branch, renderNothing, withProps } from 'recompose';
 
 import HomePage from 'containers/HomePage';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Users from 'containers/Users';
 import Sidebar from 'components/Sidebar';
-import { compose, branch, renderNothing, withProps } from 'recompose';
+import UsersPage from 'components/UsersPage';
 
 import './styles.css';
 
@@ -33,6 +34,7 @@ export default () => (
     <Navigation />
     <Switch>
       <Route exact path="/" component={HomePage} />
+      <Route exact path="/users" component={UsersPage} />
       <Route component={NotFoundPage} />
     </Switch>
   </div>

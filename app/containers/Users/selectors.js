@@ -19,10 +19,14 @@ const selectUsersDomain = state => state.get('users', initialState);
 const friendship = user => user.friendship;
 
 const makeSelectUsers = () =>
-  createSelector(selectUsersDomain, substate => substate.get('users'));
+  createSelector(selectUsersDomain, substate => substate.get('users').toJS());
 
 const makeSelectOwnUser = () =>
   createSelector(makeSelectUsers(), find(user => friendship(user) === 'own'));
 
+const isLoadingSelector = createSelector(selectUsersDomain, state =>
+  state.get('loading'),
+);
+
 export default makeSelectUsers;
-export { selectUsersDomain, makeSelectOwnUser };
+export { selectUsersDomain, makeSelectOwnUser, isLoadingSelector };

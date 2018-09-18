@@ -41,6 +41,24 @@
     WHERE users.id = {{ user_id }} ORDER BY messages_1.id, relations_1.id
 {% endquery %}
 
+{% query 'get_one_threads' %}
+    SELECT u.id AS users_id,
+        u.name AS users_name,
+        t.id AS threads_id,
+        t.title AS threads_title,
+        t.is_still_participant AS threads_is_still_participant,
+        t.status AS threads_status,
+        t.thread_type AS threads_thread_type,
+        t.thread_path AS threads_thread_path,
+        messages.id,
+        messages.content
+    FROM userthread
+        INNER JOIN threads as t on t.id = `userthread`.`ThreadId`
+        INNER JOIN users as u on u.id = `userthread`.`UserId`
+        INNER JOIN messages on `userthread`.`ThreadId` = `messages`.`ThreadId`
+    WHERE userthread.UserId = {{ user_id }}
+{% endquery %}
+
 {% query 'get_own' %}
     SELECT users.id AS users_id, users.name AS users_name, users.fb_id AS users_fb_id
     FROM users INNER JOIN relations ON users.id = relations.`UserId`

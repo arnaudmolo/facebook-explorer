@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import 'reactstrap';
 import PropTypes from 'prop-types';
 import './styles.css';
@@ -18,16 +19,16 @@ function Sidebar(props) {
       </div>
       <ul className="list-unstyled components">
         <li className="active">
-          <a href="/">Home</a>
+          <Link to="/">Home</Link>
         </li>
         <li>
-          <a href="/users">USers</a>
+          <Link to="/users">Users</Link>
         </li>
         <li>
-          <a href="/threads">Threads</a>
+          <Link to="/threads">Threads</Link>
         </li>
         <li>
-          <a href="/cartho">Carthographie</a>
+          <Link to="/cartho">Carthographie</Link>
         </li>
       </ul>
     </nav>

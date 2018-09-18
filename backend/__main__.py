@@ -4,6 +4,8 @@ import json
 from flask import request
 from flask_restful import Resource
 from snaql.factory import Snaql
+from operator import itemgetter
+from itertools import groupby
 from schema import Schema, And, Use, SchemaError
 from snaql.convertors import guard_date
 
@@ -105,11 +107,36 @@ class User(Resource):
         co = create_connection()
         cursor = co.cursor()
         cursor.execute(
-            users_queries.get_one(**dict(
+            users_queries.get_one_threads(**dict(
                 user_id = user_id
             ))
         )
-        return list(cursor.fetchone())
+        # res = []
+        # for row in cursor.fetchall():
+        #     print(row)
+        res = cursor.fetchall()
+        print(len(res))
+        # print(res)
+        sorted_input = sorted(res, key=itemgetter(2))
+        final_threads = []
+        for thread_id, grouped_thread in groupby(sorted_input, key=itemgetter(2)):
+            t2 = list(v for v in grouped_thread)
+            final_threads.append(
+                (
+                    thread_id,
+                    t2[0][3],
+                    t2[0][4],
+                    t2[0][5],
+                    t2[0][6],
+                    t2[0][7],
+                )
+            )
+        return [
+            res[0][0],
+            res[0][1],
+            final_threads,
+            [(item[2], item[8], item[9]) for item in res]
+        ]
 
 api.add_resource(Threads, '/threads')
 api.add_resource(Thread, '/threads/<thread_id>')

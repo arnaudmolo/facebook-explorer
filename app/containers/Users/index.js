@@ -10,19 +10,23 @@ import { lifecycle } from 'recompose';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
-import makeSelectUsers, { makeSelectOwnUser } from './selectors';
+import makeSelectUsers, {
+  makeSelectOwnUser,
+  isLoadingSelector,
+} from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-import { requestUsers } from './actions';
+import { requestUsers, requestUser } from './actions';
 
 const mapStateToProps = createStructuredSelector({
   users: makeSelectUsers(),
   own: makeSelectOwnUser(),
+  loading: isLoadingSelector,
 });
 
 const withConnect = connect(
   mapStateToProps,
-  { requestUsers },
+  { requestUsers, requestUser },
 );
 
 const withReducer = injectReducer({ key: 'users', reducer });
@@ -33,8 +37,10 @@ export default compose(
   withSaga,
   withConnect,
   lifecycle({
-    componentDidMount() {
-      this.props.requestUsers();
+    componentWillMount() {
+      if (!this.props.loading) {
+        this.props.requestUsers();
+      }
     },
   }),
 );
