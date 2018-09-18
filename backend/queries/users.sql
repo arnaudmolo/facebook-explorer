@@ -46,3 +46,20 @@
     FROM users INNER JOIN relations ON users.id = relations.`UserId`
     WHERE relations.friendship = 'own'
 {% endquery %}
+
+{% query 'get_own_and_messages' %}
+    SELECT users.id AS users_id,
+        users.name AS users_name,
+        users.fb_id AS users_fb_id,
+        messages_1.id AS messages_1_id,
+        messages_1.content AS messages_1_content,
+        messages_1.timestamp AS messages_1_timestamp,
+        messages_1.type AS messages_1_type,
+        messages_1.`ThreadId` AS `messages_1_ThreadId`,
+        messages_1.`UserId` AS `messages_1_UserId`
+    FROM users
+        LEFT OUTER JOIN messages AS messages_1 ON users.id = messages_1.`UserId`
+        LEFT OUTER JOIN relations AS relations_1 ON users.id = relations_1.`UserId`
+    WHERE relations_1.friendship = 'own'
+    ORDER BY messages_1.id, relations_1.id
+{% endquery %}

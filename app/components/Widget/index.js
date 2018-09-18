@@ -22,6 +22,8 @@ const zip = zipObj([
   'status',
   'thread_type',
   'thread_path',
+  'total',
+  'own',
 ]);
 
 const withAsync = compose(
@@ -37,6 +39,7 @@ const withAsync = compose(
 class Widget extends React.PureComponent {
   render(props = this.props) {
     const { threads } = props;
+    console.log(threads);
     return (
       <div className="widget-container">
         <p>{this.props.title}</p>
@@ -47,14 +50,11 @@ class Widget extends React.PureComponent {
               key={thread.thread_path}
             >
               <ConversationTitle>{thread.title}</ConversationTitle>
-              {props.meta && (
+              {thread.own && (
                 <PieChart
                   width={20}
                   height={20}
-                  values={[
-                    thread.meta.mine,
-                    thread.meta.total - thread.meta.mine,
-                  ]}
+                  values={[thread.own, thread.total - thread.own]}
                 />
               )}
             </ListGroupItem>
