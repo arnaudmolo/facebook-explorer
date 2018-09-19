@@ -36,3 +36,20 @@
         threads.thread_path
     ORDER BY FIELD(`threads`.`id`, {{threads_ids|join(', ')}})
 {% endquery %}
+
+{% query 'create_thread'%}
+    INSERT INTO threads (
+        title,
+        is_still_participant,
+        status,
+        thread_type,
+        thread_path
+    )
+    VALUES (
+        {{title|guards.string}},
+        {{is_still_participant|guards.bool}},
+        {{status|guards.string}},
+        {{thread_type|guards.string}},
+        {{thread_path|guards.string}}
+    )
+{% endquery %}

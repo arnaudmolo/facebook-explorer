@@ -16,7 +16,7 @@ def create_connection ():
         host = "localhost",
         user = "root",
         passwd = "root",
-        database = "fb_json_python_2",
+        database = "fb_json_python_3",
         port = 8889
     )
 
