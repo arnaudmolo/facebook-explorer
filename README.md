@@ -47,10 +47,13 @@ pip install -r requirements.txt
 ```
 
 launch the python scrapper:
-````
+```
 python backend/scrapper.py
 ```
+
 Wait for the scrapper to import your datas into the database.
+
+you can now launche the python server
 
 # Frontend
 
