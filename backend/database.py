@@ -1,8 +1,10 @@
-from flask import Flask
-from flask_cors import CORS
-from flask_restful import Api
+import mysql.connector
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-
-api = Api(app)
+def create_connection ():
+    return mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        passwd = "root",
+        database = "fb_json_python_3",
+        port = 8889
+    )
