@@ -83,3 +83,25 @@
     WHERE relations_1.friendship = 'own'
     ORDER BY messages_1.id, relations_1.id
 {% endquery %}
+
+{% query 'create_user'%}
+INSERT INTO users (name, fb_id)
+VALUES ({{name|guards.string}}, {{fb_id}})
+{% endquery %}
+
+{% query 'create_relation'%}
+INSERT INTO relations (timestamp, friendship, UserId)
+VALUES 
+    ({{timestamp|guards.datetime}},
+    {{friendship|guards.string}},
+    {% if user_id %}
+        {{user_id|guards.integer}}
+    {% else %}
+        LAST_INSERT_ID()
+    {% endif %}
+    )
+{% endquery %}
+
+{% query 'find_one_by_name'%}
+SELECT users.id FROM users WHERE users.name = {{name|guards.string}} LIMIT 0, 1
+{% endquery %}
