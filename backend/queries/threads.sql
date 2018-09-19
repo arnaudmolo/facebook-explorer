@@ -53,3 +53,11 @@
         {{thread_path|guards.string}}
     )
 {% endquery %}
+
+{% query 'create_threads_users'%}
+INSERT INTO userthread (UserId, ThreadId)
+VALUES 
+    {% for user in users %}
+        ({{user.id|guards.integer}}, {{thread_id|guards.integer}}),
+    {% endfor %}
+{% endquery %}

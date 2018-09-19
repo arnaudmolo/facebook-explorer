@@ -22,10 +22,12 @@ def create_connection ():
 
 co = create_connection()
 cursor = co.cursor()
+
 cursor.execute("DELETE FROM relations;")
 cursor.execute("DELETE from users;")
 cursor.execute("DELETE from messages;")
 cursor.execute("DELETE from threads;")
+cursor.execute("DELETE from userthread;")
 
 def create_user (user):
     create_user_query = users_queries.create_user(**user)
@@ -33,10 +35,7 @@ def create_user (user):
         create_user_query
     )
 
-
 def register_users (filename, accessor, status):
-    # co = create_connection()
-    # cursor = co.cursor()
     with open(filename) as file:
         data = json.load(file)
     futur_users = accessor(data)
@@ -64,31 +63,19 @@ def register_users (filename, accessor, status):
         )
     co.commit()
 
-register_users(
-    './data/friends/friends_added.json',
-    lambda data: data['friends'],
-    'friend'
-)
-register_users(
-    './data/friends/received_friend_requests.json',
-    lambda data: data['received_requests'],
-    'received'
-)
-register_users(
-    './data/friends/rejected_friend_requests.json',
-    lambda data: data['rejected_requests'],
-    'rejected'
-)
-register_users(
-    './data/friends/removed_friends.json',
-    lambda data: data['deleted_friends'],
-    'removed'
-)
-register_users(
-    './data/friends/sent_friend_requests.json',
-    lambda data: data['sent_requests'],
-    'sent'
-)
+def own_is_different (data):
+    return [
+        dict(
+            name= data['profile']['name'],
+            timestamp= data['profile']['registration_timestamp']
+        )
+    ]
+
+def findIndex(f, seq):
+    """Return first item in sequence where f(item) == True."""
+    for index, item in enumerate(seq):
+        if f(item): 
+            return index
 
 def last_id ():
     cursor.execute('SELECT LAST_INSERT_ID();')
@@ -141,15 +128,16 @@ def registerThread (url):
             ThreadId = thread_id
         )
         messages_to_save.append(message)
-        # message.user = user
-        # thread.users.append(user)
-        # thread.messages.append(message)
-    if len(messages_to_save) > 1:
-        sql = messages_queries.create_messages(**dict(messages = messages_to_save))[:-1]
+        if (findIndex(lambda u: u['id'] == user['id'], users_to_save) is None):
+            users_to_save.append(user)
+    if len(users_to_save) > 1:
         cursor.execute(
-            sql
+            threads_queries.create_threads_users(**dict(users = users_to_save, thread_id = thread_id))[:-1]
         )
-    print('thread parsed', thread_id)
+    if len(messages_to_save) > 1:
+        cursor.execute(
+            messages_queries.create_messages(**dict(messages = messages_to_save))[:-1]
+        )
 
 mypath = './data/messages'
 folders = [
@@ -157,7 +145,38 @@ folders = [
         if (os.path.isdir(os.path.join(mypath, f)) and f != 'stickers_used')
 ]
 
-for file in folders:
+register_users(
+    './data/profile_information/profile_information.json',
+    own_is_different,
+    'own'
+)
+register_users(
+    './data/friends/friends_added.json',
+    lambda data: data['friends'],
+    'friend'
+)
+register_users(
+    './data/friends/received_friend_requests.json',
+    lambda data: data['received_requests'],
+    'received'
+)
+register_users(
+    './data/friends/rejected_friend_requests.json',
+    lambda data: data['rejected_requests'],
+    'rejected'
+)
+register_users(
+    './data/friends/removed_friends.json',
+    lambda data: data['deleted_friends'],
+    'removed'
+)
+register_users(
+    './data/friends/sent_friend_requests.json',
+    lambda data: data['sent_requests'],
+    'sent'
+)
+
+for index, file in enumerate(folders):
     registerThread('./data/messages/{0}/message.json'.format(file))
-    # co.commit()
-co.commit()
+    print('register thread nb ', index + 1, 'on ', len(folders))
+    co.commit() 

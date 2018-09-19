@@ -6,7 +6,6 @@ from flask_restful import Resource
 from snaql.factory import Snaql
 from operator import itemgetter
 from itertools import groupby
-from schema import Schema, And, Use, SchemaError
 from snaql.convertors import guard_date
 
 from database import api, app
@@ -24,20 +23,6 @@ root_location = os.path.abspath(os.path.dirname(__file__))
 snaql_factory = Snaql(root_location, 'queries')
 users_queries = snaql_factory.load_queries('users.sql')
 threads_queries = snaql_factory.load_queries('threads.sql')
-
-User = Schema(dict(
-    id = And(Use(int)),
-    name = Use(str),
-    fb_id = And(str)
-))
-
-Relation = Schema(dict(
-    id = And(Use(int)),
-    timestamp = And(Use(guard_date)),
-    friendship = And(Use(str)),
-    UserId = And(Use(int))
-))
-
 user_and_messages = None
 
 class Threads(Resource):
@@ -106,6 +91,10 @@ class User(Resource):
     def get(self, user_id):
         co = create_connection()
         cursor = co.cursor()
+        print(
+            users_queries.get_one_threads(**dict(
+                user_id = user_id
+            )))
         cursor.execute(
             users_queries.get_one_threads(**dict(
                 user_id = user_id
@@ -162,6 +151,7 @@ class User(Resource):
             key=lambda item: len(itemgetter(6)(item)),
             reverse=True
         )
+        print(all)
         return [
             all[0][0],
             all[0][1],
