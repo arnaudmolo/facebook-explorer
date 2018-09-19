@@ -55,8 +55,8 @@
         messages.timestamp,
         messages.UserId
     FROM userthread
-        INNER JOIN threads as t on t.id = `messages`.`ThreadId`
-        INNER JOIN users as u on u.id = `messages`.`UserId`
+        INNER JOIN threads as t on t.id = `userthread`.`ThreadId`
+        INNER JOIN users as u on u.id = `userthread`.`UserId`
         INNER JOIN messages on `userthread`.`ThreadId` = `messages`.`ThreadId`
     WHERE userthread.UserId = {{ user_id }}
 {% endquery %}
