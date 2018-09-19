@@ -4,21 +4,13 @@ import mysql.connector
 from snaql.factory import Snaql
 from datetime import datetime
 from operator import itemgetter
+from database import create_connection
 
 root_location = os.path.abspath(os.path.dirname(__file__))
 snaql_factory = Snaql(root_location, 'queries')
 users_queries = snaql_factory.load_queries('users.sql')
 threads_queries = snaql_factory.load_queries('threads.sql')
 messages_queries = snaql_factory.load_queries('messages.sql')
-
-def create_connection ():
-    return mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        passwd = "root",
-        database = "fb_json_python_3",
-        port = 8889
-    )
 
 co = create_connection()
 cursor = co.cursor()

@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import { compose, branch, renderNothing, withProps } from 'recompose';
+import { compose, branch, withProps } from 'recompose';
 
 import HomePage from 'containers/HomePage';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
@@ -25,8 +25,7 @@ import './styles.css';
 
 const Navigation = compose(
   Users,
-  branch(props => !props.own, renderNothing),
-  withProps(props => ({ title: props.own.name })),
+  branch(props => props.own, withProps(props => ({ title: props.own.name }))),
 )(Sidebar);
 
 export default () => (

@@ -66,7 +66,6 @@ class UsersPage extends React.PureComponent {
     const selected =
       this.state.user.id &&
       this.props.users.find(user => user.id === this.state.user.id);
-    console.log(selected);
     return (
       <Container>
         <Row>
@@ -91,14 +90,16 @@ class UsersPage extends React.PureComponent {
                 <InputFilter debounceTime={200} />
                 <FilterResults
                   items={this.props.users.filter(user =>
-                    this.state.checkedStatus.includes(user.friendship),
+                    user.relations.some(relation =>
+                      this.state.checkedStatus.includes(relation.friendship),
+                    ),
                   )}
                   fuseConfig={fuseConfig}
                 >
                   {filteredItems => (
                     <div>
                       {filteredItems.map(item => (
-                        <div key={item.id}>
+                        <div key={item.name}>
                           <button onClick={this.selectUser(item)}>
                             {item.name} {scale(item.relation)}
                           </button>

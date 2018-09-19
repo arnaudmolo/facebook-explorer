@@ -5,23 +5,6 @@ import request from 'utils/request';
 import { REQUEST_USERS, REQUEST_USER } from './constants';
 import { loadedUsers, requestUsersError, loadedUser } from './actions';
 
-const zip = zipObj([
-  'id',
-  'name',
-  'fb_id',
-  'relation_id',
-  'date',
-  'friendship',
-]);
-
-const parse = compose(
-  user => ({
-    ...user,
-    name: decodeURIComponent(escape(user.name)),
-  }),
-  zip,
-);
-
 export function* getUser(action) {
   const requestURL = `//127.0.0.1:5002/users/${action.payload}`;
   try {
@@ -59,6 +42,18 @@ export function* getUser(action) {
     console.error(e);
   }
 }
+
+const parseUser = zipObj(['id', 'name', 'fb_id', 'relations']);
+
+const parse = compose(
+  user => ({
+    ...user,
+    name: decodeURIComponent(escape(user.name)),
+    relations: user.relations.map(zipObj(['id', 'date', 'friendship'])),
+  }),
+  parseUser,
+);
+
 export function* getUsers() {
   const requestURL = '//127.0.0.1:5002/users';
   try {

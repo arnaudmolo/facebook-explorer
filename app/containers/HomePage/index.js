@@ -11,7 +11,7 @@
 
 import React from 'react';
 import Widget from 'components/Widget';
-import { Jumbotron, Container, Row } from 'reactstrap';
+import { Jumbotron, Container, Row, Col } from 'reactstrap';
 import './styles.css';
 
 /* eslint-disable react/prefer-stateless-function */
@@ -29,14 +29,16 @@ export default class HomePage extends React.PureComponent {
           </Jumbotron>
         </Row>
         <Row>
-          <Widget
-            title="Threads with the most messages."
-            url="//localhost:5002/threads?count=10"
-          />
-          <Widget
-            title="Threads I most posted in."
-            url="//localhost:5002/threads?count=10&order=own"
-          />
+          <Col>
+            <h2>Threads with the most messages.</h2>
+          </Col>
+          <Col>
+            <h2>Threads I most posted in.</h2>
+          </Col>
+        </Row>
+        <Row>
+          <Widget url="//localhost:5002/threads?count=10" />
+          <Widget url="//localhost:5002/threads?count=10&order=own" />
         </Row>
       </Container>
     );

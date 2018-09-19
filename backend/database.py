@@ -5,6 +5,6 @@ def create_connection ():
         host = "localhost",
         user = "root",
         passwd = "root",
-        database = "fb_json_python_3",
+        database = "facebook-explorer",
         port = 8889
     )

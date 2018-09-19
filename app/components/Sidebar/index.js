@@ -14,23 +14,31 @@ import './styles.css';
 function Sidebar(props) {
   return (
     <nav className="sidebar">
-      <div className="sidebar-header">
-        <h3>{props.title}</h3>
-      </div>
-      <ul className="list-unstyled components">
-        <li className="active">
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/users">Users</Link>
-        </li>
-        <li>
-          <Link to="/threads">Threads</Link>
-        </li>
-        <li>
-          <Link to="/cartho">Carthographie</Link>
-        </li>
-      </ul>
+      {props.title ? (
+        <React.Fragment>
+          <div className="sidebar-header">
+            <h3>{props.title}</h3>
+          </div>
+          <ul className="list-unstyled components">
+            <li className="active">
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/users">Users</Link>
+            </li>
+            <li>
+              <Link to="/threads">Threads</Link>
+            </li>
+            <li>
+              <Link to="/cartho">Carthographie</Link>
+            </li>
+          </ul>
+        </React.Fragment>
+      ) : (
+        <div>
+          No data is beeing loaded. Please follow the readme instructions.
+        </div>
+      )}
     </nav>
   );
 }

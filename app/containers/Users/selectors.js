@@ -16,13 +16,14 @@ const selectUsersDomain = state => state.get('users', initialState);
  * Default selector used by Users
  */
 
-const friendship = user => user.friendship;
-
 const makeSelectUsers = () =>
   createSelector(selectUsersDomain, substate => substate.get('users').toJS());
 
 const makeSelectOwnUser = () =>
-  createSelector(makeSelectUsers(), find(user => friendship(user) === 'own'));
+  createSelector(
+    makeSelectUsers(),
+    find(user => user.relations.some(({ friendship }) => friendship === 'own')),
+  );
 
 const isLoadingSelector = createSelector(selectUsersDomain, state =>
   state.get('loading'),

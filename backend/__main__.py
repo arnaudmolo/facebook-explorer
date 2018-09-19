@@ -91,10 +91,22 @@ class Users(Resource):
         cursor.execute(
             users_queries.get_all()
         )
-        return [
-            (id, name, fb_id, relation_id, date.isoformat(), friendship)
-            for (id, name, fb_id, relation_id, date, friendship, _) in cursor.fetchall()
-        ]
+        res = cursor.fetchall()
+        user_id_accessor = itemgetter(0)
+
+        res3 = []
+        for user_id, grouped_relations in groupby(sorted(res, key = user_id_accessor), key = user_id_accessor):
+            grouped_relations = list(grouped_relations)
+            (id, name, fb_id, *tail) = grouped_relations[0]
+            res3.append(
+                (id, name, fb_id, [
+                    (relation_id, date.isoformat(), friendship)
+                        for (id, name, fb_id, relation_id, date, friendship, *tail)
+                        in grouped_relations
+                ])
+            )
+
+        return res3
 
 class User(Resource):
     def get(self, user_id):
@@ -108,6 +120,9 @@ class User(Resource):
             ))
         )
         rows = cursor.fetchall()
+        if len(rows) is 0:
+            return [int(user_id), None, []]
+
         final_threads = []
 
         thread_id_accessor = itemgetter(2)
@@ -142,8 +157,8 @@ class User(Resource):
                 )
             )
         return [
-            rows[0][0],
-            rows[0][1],
+            rows[0][0], #user id
+            rows[0][1], #user fb_id
             sorted(
                 final_threads,
                 key=lambda item: len(itemgetter(7)(item)), # Order by most messages.
