@@ -21,8 +21,7 @@ const zip = zipObj([
   'status',
   'thread_type',
   'thread_path',
-  'total',
-  'own',
+  'meta',
 ]);
 
 const withAsync = branch(
@@ -50,12 +49,8 @@ class Widget extends React.PureComponent {
               key={thread.thread_path}
             >
               <ConversationTitle>{thread.title}</ConversationTitle>
-              {thread.own && (
-                <PieChart
-                  width={20}
-                  height={20}
-                  values={[thread.own, thread.total - thread.own]}
-                />
+              {thread.meta && (
+                <PieChart width={20} height={20} values={thread.meta} />
               )}
             </ListGroupItem>
           ))}

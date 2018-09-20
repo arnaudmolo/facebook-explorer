@@ -11,8 +11,7 @@ const parse = zipObj([
   'status',
   'thread_type',
   'thread_path',
-  'total',
-  'own',
+  'meta',
 ]);
 
 export function* getThreads() {

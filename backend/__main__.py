@@ -61,8 +61,8 @@ class Threads(Resource):
             )))
 
             return [
-                (id, title, is_still_participant, status, thread_type, thread_path, total, own)
-                for (id, title, is_still_participant, status, thread_type, thread_path, total), (_, own) in zip(
+                (id, title, is_still_participant, status, thread_type, thread_path, {'total': total, ownid:own})
+                for (id, title, is_still_participant, status, thread_type, thread_path, total), (ownid, own) in zip(
                     cursor.fetchall(),
                     top_map_id_thrad
                 )
@@ -80,7 +80,9 @@ class Threads(Resource):
         print(len(res))
 
         return [
-            (id, title, is_still_participant, status, thread_type, thread_path, total, map_id_nb_message.get(id, 0))
+            (id, title, is_still_participant, status, thread_type, thread_path, {
+                'total': total, id: map_id_nb_message.get(id, 0)
+            })
             for id, title, is_still_participant, status, thread_type, thread_path, total in res
         ]
 

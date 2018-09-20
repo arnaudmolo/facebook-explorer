@@ -1,4 +1,6 @@
+import { flatten } from 'ramda';
 import { createSelector } from 'reselect';
+import makeSelectUsers from 'containers/Users/selectors';
 import { initialState } from './reducer';
 
 /**
@@ -16,7 +18,15 @@ const selectThreadsDomain = state => state.get('threads', initialState);
  */
 
 const makeSelectThreads = () =>
-  createSelector(selectThreadsDomain, substate => substate.toJS());
+  createSelector(selectThreadsDomain, makeSelectUsers(), (substate, users) => {
+    if (substate.get('threads').count()) {
+      return substate.toJS();
+    }
+    return {
+      threads: flatten(users.map(user => user.threads)).filter(e => e),
+      loading: substate.get('loading'),
+    };
+  });
 
 export default makeSelectThreads;
 export { selectThreadsDomain };

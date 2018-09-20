@@ -50,7 +50,7 @@ export default compose(
   withConnect,
   lifecycle({
     componentWillMount() {
-      if (!this.props.loading && this.props.threads.length === 0) {
+      if (!this.props.loading) {
         this.props.requestThreads();
       }
     },
