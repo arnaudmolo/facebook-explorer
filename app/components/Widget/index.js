@@ -9,7 +9,7 @@ import request from 'utils/request';
 import ConversationTitle from 'components/ConversationTitle';
 import PieChart from 'components/PieChart';
 import { ListGroup, ListGroupItem, Col } from 'reactstrap';
-import { lifecycle, withState, compose } from 'recompose';
+import { lifecycle, withState, compose, branch } from 'recompose';
 import { zipObj, map } from 'ramda';
 import './styles.css';
 
@@ -25,13 +25,16 @@ const zip = zipObj([
   'own',
 ]);
 
-const withAsync = compose(
-  withState('threads', 'setThreads', []),
-  lifecycle({
-    async componentWillMount() {
-      this.props.setThreads(await request(this.props.url).then(map(zip)));
-    },
-  }),
+const withAsync = branch(
+  props => props.url,
+  compose(
+    withState('threads', 'setThreads', []),
+    lifecycle({
+      async componentWillMount() {
+        this.props.setThreads(await request(this.props.url).then(map(zip)));
+      },
+    }),
+  ),
 );
 
 /* eslint-disable react/prefer-stateless-function */
