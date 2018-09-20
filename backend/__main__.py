@@ -67,7 +67,7 @@ class Threads(Resource):
                     top_map_id_thrad
                 )
             ]
-
+    
         cursor.execute(
             threads_queries.get_all(**dict(
                 limit = limit,
@@ -75,9 +75,13 @@ class Threads(Resource):
             ))
         )
 
+        res = cursor.fetchall()
+
+        print(len(res))
+
         return [
-            (id, title, is_still_participant, status, thread_type, thread_path, total, map_id_nb_message[id])
-            for id, title, is_still_participant, status, thread_type, thread_path, total in cursor.fetchall()
+            (id, title, is_still_participant, status, thread_type, thread_path, total, map_id_nb_message.get(id, 0))
+            for id, title, is_still_participant, status, thread_type, thread_path, total in res
         ]
 
 class Thread(Resource):

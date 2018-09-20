@@ -6,7 +6,7 @@
     threads.thread_type AS threads_thread_type,
     threads.thread_path AS threads_thread_path,
     count(messages.`UserId`) AS total
-    FROM threads INNER JOIN messages ON threads.id = messages.`ThreadId`
+    FROM threads LEFT JOIN messages ON threads.id = messages.`ThreadId`
     GROUP BY threads.id,
         threads.title,
         threads.is_still_participant,
@@ -14,8 +14,10 @@
         threads.thread_type,
         threads.thread_path
     ORDER BY total DESC
-    LIMIT {{offset}},
+    {% if limit != 0%}
+        LIMIT {{offset}},
     {{limit}}
+    {% endif %}
 {% endquery %}
 
 {% query 'get_threads_in' %}
