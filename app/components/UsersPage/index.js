@@ -9,9 +9,11 @@ import Users from 'containers/Users';
 import fuzzyFilterFactory from 'react-fuzzy-filter';
 import PropTypes from 'prop-types';
 import { scaleOrdinal } from 'd3';
-
+import { FormattedMessage } from 'react-intl';
 import { Container, Row, Col, FormGroup, Label, Input, Form } from 'reactstrap';
+
 import User from './User';
+import messages from './messages';
 
 const { InputFilter, FilterResults } = fuzzyFilterFactory();
 
@@ -80,7 +82,9 @@ class UsersPage extends React.PureComponent {
                       onChange={this.onChange}
                       checked={this.state.checkedStatus.includes(status)}
                     />{' '}
-                    <p>{status}</p>
+                    <p>
+                      <FormattedMessage {...messages[status]} />
+                    </p>
                   </Label>
                 ))}
               </FormGroup>

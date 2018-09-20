@@ -11,7 +11,10 @@
 
 import React from 'react';
 import Widget from 'components/Widget';
+import { FormattedMessage } from 'react-intl';
 import { Jumbotron, Container, Row, Col } from 'reactstrap';
+
+import messages from './messages';
 import './styles.css';
 
 /* eslint-disable react/prefer-stateless-function */
@@ -21,19 +24,24 @@ export default class HomePage extends React.PureComponent {
       <Container>
         <Row>
           <Jumbotron>
-            <h1 className="display-3">Coucou.</h1>
+            <h1 className="display-3">
+              <FormattedMessage {...messages.header} />
+            </h1>
             <p className="lead">
-              Facebook absorbe beaucoup de données. Essayons de les explorer
-              ensemble :)
+              <FormattedMessage {...messages.lead} />
             </p>
           </Jumbotron>
         </Row>
         <Row>
           <Col>
-            <h2>Threads with the most messages.</h2>
+            <h2>
+              <FormattedMessage {...messages.mostMessages} />
+            </h2>
           </Col>
           <Col>
-            <h2>Threads I most posted in.</h2>
+            <h2>
+              <FormattedMessage {...messages.myMessages} />
+            </h2>
           </Col>
         </Row>
         <Row>

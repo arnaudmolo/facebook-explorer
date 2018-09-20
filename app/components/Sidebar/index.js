@@ -8,8 +8,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import 'reactstrap';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+
 import './styles.css';
-// import styled from 'styled-components';
+import messages from './messages';
 
 function Sidebar(props) {
   return (
@@ -21,22 +23,30 @@ function Sidebar(props) {
           </div>
           <ul className="list-unstyled components">
             <li className="active">
-              <Link to="/">Home</Link>
+              <Link to="/">
+                <FormattedMessage {...messages.home} />
+              </Link>
             </li>
             <li>
-              <Link to="/users">Users</Link>
+              <Link to="/users">
+                <FormattedMessage {...messages.users} />
+              </Link>
             </li>
             <li>
-              <Link to="/threads">Threads</Link>
+              <Link to="/threads">
+                <FormattedMessage {...messages.threads} />
+              </Link>
             </li>
             <li>
-              <Link to="/cartho">Carthographie</Link>
+              <Link to="/cartho">
+                <FormattedMessage {...messages.cartho} />
+              </Link>
             </li>
           </ul>
         </React.Fragment>
       ) : (
         <div>
-          No data is beeing loaded. Please follow the readme instructions.
+          <FormattedMessage {...messages.noData} />
         </div>
       )}
     </nav>
