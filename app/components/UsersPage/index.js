@@ -87,7 +87,13 @@ class UsersPage extends React.PureComponent {
             </Form>
             {this.props.users.length && (
               <div className="container">
-                <InputFilter debounceTime={200} />
+                <InputFilter
+                  debounceTime={200}
+                  inputProps={{
+                    className: 'form-control',
+                    placeholder: 'Type a name',
+                  }}
+                />
                 <FilterResults
                   items={this.props.users.filter(user =>
                     user.relations.some(relation =>

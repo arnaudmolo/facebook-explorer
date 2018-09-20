@@ -26,6 +26,20 @@ def create_user (user):
     cursor.execute(
         create_user_query
     )
+    return dict(
+        user,
+        id = last_id()
+    )
+
+def find_user (user):
+    cursor.execute(
+        users_queries.find_one_by_name(**user)
+    )
+    sqluser = cursor.fetchone()
+    return dict(
+        user,
+        id = sqluser[0]
+    )
 
 def register_users (filename, accessor, status):
     with open(filename) as file:
@@ -39,16 +53,9 @@ def register_users (filename, accessor, status):
             friendship = status
         )
         try:
-            create_user(user)
+            user = create_user(user)
         except:
-            cursor.execute(
-                users_queries.find_one_by_name(**user)
-            )
-            sqluser = cursor.fetchone()
-            user = dict(
-                user,
-                user_id = sqluser[0]
-            )
+            user = find_user(user)
         create_relation_query = users_queries.create_relation(**user)
         cursor.execute(
             create_relation_query
@@ -73,7 +80,7 @@ def last_id ():
     cursor.execute('SELECT LAST_INSERT_ID();')
     return cursor.fetchone()[0]
 
-def registerThread (url):
+def register_thread (url):
     status = 'unknown'
     with open(url) as f:
         futur_thread = json.load(f)
@@ -87,7 +94,7 @@ def registerThread (url):
     cursor.execute(threads_queries.create_thread(**thread))
     thread_id = last_id()
     messages = futur_thread.get('messages', [])
-    users_to_save = []
+    users_to_save = [user(name=name) for name in futur_thread.get('participant', [])]
     messages_to_save = []
     for message in messages:
         user = dict(
@@ -97,21 +104,9 @@ def registerThread (url):
             friendship = status
         )
         try:
-            create_user(user)
-            user_id = last_id()
-            user = dict(
-                user,
-                id = user_id
-            )
+            user = create_user(user)
         except Exception as error:
-            cursor.execute(
-                users_queries.find_one_by_name(**user)
-            )
-            sqluser = cursor.fetchone()
-            user = dict(
-                user,
-                id = itemgetter(0)(sqluser)
-            )
+            user = find_user(user)
         message = dict(
             content = message.get('content', 'Empty Content'),
             timestamp = datetime.now(),
@@ -169,6 +164,6 @@ register_users(
 )
 
 for index, file in enumerate(folders):
-    registerThread('./data/messages/{0}/message.json'.format(file))
+    register_thread('./data/messages/{0}/message.json'.format(file))
     print('register thread nb ', index + 1, 'on ', len(folders))
     co.commit() 

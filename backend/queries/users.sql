@@ -94,8 +94,8 @@ INSERT INTO relations (timestamp, friendship, UserId)
 VALUES 
     ({{timestamp|guards.datetime}},
     {{friendship|guards.string}},
-    {% if user_id %}
-        {{user_id|guards.integer}}
+    {% if id %}
+        {{id|guards.integer}}
     {% else %}
         LAST_INSERT_ID()
     {% endif %}
