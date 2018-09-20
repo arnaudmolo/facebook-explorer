@@ -1,6 +1,7 @@
 import json
 import os
 import mysql.connector
+
 from snaql.factory import Snaql
 from datetime import datetime
 from operator import itemgetter
