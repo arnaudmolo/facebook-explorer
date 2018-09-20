@@ -15,12 +15,6 @@ messages_queries = snaql_factory.load_queries('messages.sql')
 co = create_connection()
 cursor = co.cursor()
 
-cursor.execute("DELETE FROM relations;")
-cursor.execute("DELETE from users;")
-cursor.execute("DELETE from messages;")
-cursor.execute("DELETE from threads;")
-cursor.execute("DELETE from userthread;")
-
 def create_user (user):
     create_user_query = users_queries.create_user(**user)
     cursor.execute(
@@ -40,6 +34,13 @@ def find_user (user):
         user,
         id = sqluser[0]
     )
+
+def save_or_find (user):
+    try:
+        return create_user(user)
+    except Exception as error:
+        pass
+    return find_user(user)
 
 def register_users (filename, accessor, status):
     with open(filename) as file:
@@ -94,7 +95,7 @@ def register_thread (url):
     cursor.execute(threads_queries.create_thread(**thread))
     thread_id = last_id()
     messages = futur_thread.get('messages', [])
-    users_to_save = [user(name=name) for name in futur_thread.get('participant', [])]
+    users_to_save = [save_or_find(dict(name=name, fb_id='null')) for name in set(futur_thread.get('participants', []))]
     messages_to_save = []
     for message in messages:
         user = dict(
@@ -107,23 +108,26 @@ def register_thread (url):
             user = create_user(user)
         except Exception as error:
             user = find_user(user)
-        message = dict(
+        messages_to_save.append(dict(
             content = message.get('content', 'Empty Content'),
             timestamp = datetime.now(),
             type = message['type'],
             UserId = user['id'],
             ThreadId = thread_id
-        )
-        messages_to_save.append(message)
+        ))
         if (findIndex(lambda u: u['id'] == user['id'], users_to_save) is None):
             users_to_save.append(user)
     if len(users_to_save) > 1:
         cursor.execute(
-            threads_queries.create_threads_users(**dict(users = users_to_save, thread_id = thread_id))[:-1]
+            threads_queries.create_threads_users(
+                **dict(users = users_to_save, thread_id = thread_id)
+            )[:-1]
         )
     if len(messages_to_save) > 1:
         cursor.execute(
-            messages_queries.create_messages(**dict(messages = messages_to_save))[:-1]
+            messages_queries.create_messages(
+                **dict(messages = messages_to_save)
+            )[:-1]
         )
 
 mypath = './data/messages'
@@ -131,6 +135,12 @@ folders = [
     f for f in os.listdir(mypath)
         if (os.path.isdir(os.path.join(mypath, f)) and f != 'stickers_used')
 ]
+
+cursor.execute("DELETE FROM relations;")
+cursor.execute("DELETE from users;")
+cursor.execute("DELETE from messages;")
+cursor.execute("DELETE from threads;")
+cursor.execute("DELETE from userthread;")
 
 register_users(
     './data/profile_information/profile_information.json',
