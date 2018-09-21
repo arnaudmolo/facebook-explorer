@@ -34,7 +34,13 @@ const Thread = lifecycle({
         <div>
           <h1>{props.thread.title}</h1>
           <ul>
-            {props.thread.users.map(([id, user]) => <li key={id}>{user}</li>)}
+            {props.thread.users.map(([id, user]) => (
+              <li key={id}>
+                {user}{' '}
+                {props.thread.meta[id] &&
+                  `posted ${props.thread.meta[id]} messages`}
+              </li>
+            ))}
           </ul>
         </div>
       );

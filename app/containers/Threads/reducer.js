@@ -44,16 +44,19 @@ function reduceThreadList(state, action) {
     .get('threads')
     .findIndex(item => item.get('id') === action.payload.id);
   if (toUpdate >= 0) {
-    return state.set(
-      'threads',
-      state
-        .get('threads')
-        .update(toUpdate, item =>
-          item
-            .set('messages', fromJS(action.payload.messages))
-            .set('users', fromJS(action.payload.users)),
-        ),
-    );
+    if (action.payload.messages) {
+      return state.set(
+        'threads',
+        state
+          .get('threads')
+          .update(toUpdate, item =>
+            item
+              .set('messages', fromJS(action.payload.messages))
+              .set('users', fromJS(action.payload.users)),
+          ),
+      );
+    }
+    return state;
   }
   return state.set(
     'threads',
