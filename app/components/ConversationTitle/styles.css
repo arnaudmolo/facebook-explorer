@@ -4,13 +4,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .conversation-title>p {
-    display: inline;
-  }
-  .conversation-title>p:after {
-    content: ", ";
-  }
-  .conversation-title>p:last-child:after {
-    content: "";
-  }
-  
+.conversation-title>p {
+  display: inline;
+}
+.conversation-title>p:after {
+  content: ", ";
+}
+.conversation-title>p:last-child:after {
+  content: "";
+}
+.conversation-title>.active {
+  color: black;
+}

@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { lifecycle } from 'recompose';
 import { Container, Row, Col } from 'reactstrap';
+import { Route } from 'react-router-dom';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
@@ -20,48 +21,10 @@ import reducer from './reducer';
 import saga from './saga';
 // import messages from './messages';
 import { requestThreads, requestThread } from './actions';
-
-const Thread = lifecycle({
-  componentWillMount() {
-    this.props.onMount();
-  },
-})(props => {
-  let content = <h1>Loading...</h1>;
-  if (props.thread) {
-    content = <h1>{props.thread.title}</h1>;
-    if (props.thread.users) {
-      content = (
-        <div>
-          <h1>{props.thread.title}</h1>
-          <ul>
-            {props.thread.users.map(([id, user]) => (
-              <li key={id}>
-                {user}{' '}
-                {props.thread.meta[id] &&
-                  `posted ${props.thread.meta[id]} messages`}
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
-  }
-  return (
-    <div>
-      {content}
-      <h3>Vizs will come there</h3>
-    </div>
-  );
-});
-
-Thread.propTypes = {
-  onMount: PropTypes.func,
-};
+import { Thread } from './Thread';
 
 function Threads(props) {
   const { threads } = props;
-  const threadId = +props.match.params.id;
-  const selected = props.threads.find(thread => thread.id === threadId);
   return (
     <Container>
       <Row>
@@ -69,12 +32,7 @@ function Threads(props) {
           <Widget threads={threads} />
         </Col>
         <Col>
-          {props.match.params.id && (
-            <Thread
-              onMount={() => props.requestThread(threadId)}
-              thread={selected}
-            />
-          )}
+          <Route path="/threads/:id" component={Thread} />
         </Col>
       </Row>
     </Container>
@@ -83,13 +41,11 @@ function Threads(props) {
 
 Threads.propTypes = {
   threads: PropTypes.array,
-  match: PropTypes.object,
-  requestThread: PropTypes.func,
 };
 
 const mapStateToProps = makeSelectThreads();
 
-const withConnect = connect(
+export const withConnect = connect(
   mapStateToProps,
   { requestThreads, requestThread },
 );
