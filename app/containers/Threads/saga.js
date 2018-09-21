@@ -1,20 +1,30 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
 import request from 'utils/request';
-import { zipObj } from 'ramda';
+import { zipObj, compose } from 'ramda';
 import { loadedThreads, requestThreadsError, loadedThread } from './actions';
 import { REQUEST_THREADS, REQUEST_THREAD } from './constants';
 
-const parse = zipObj([
-  'id',
-  'title',
-  'is_still_participant',
-  'status',
-  'thread_type',
-  'thread_path',
-  'meta',
-  'users',
-  'messages',
-]);
+const parse = compose(
+  thread => ({
+    ...thread,
+    title: decodeURIComponent(escape(thread.title)),
+    users: thread.users.map(([id, username]) => [
+      id,
+      decodeURIComponent(escape(username)),
+    ]),
+  }),
+  zipObj([
+    'id',
+    'title',
+    'is_still_participant',
+    'status',
+    'thread_type',
+    'thread_path',
+    'meta',
+    'users',
+    'messages',
+  ]),
+);
 
 export function* getThread(action) {
   const requestURL = `//127.0.0.1:5002/threads/${action.payload}`;

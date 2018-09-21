@@ -13,9 +13,7 @@ function ConversationTitle(props) {
   return (
     <div className="conversation-title">
       <NavLink to={props.to}>
-        {props.loading
-          ? 'Loading...'
-          : decodeURIComponent(escape(props.children))}
+        {props.loading ? 'Loading...' : props.children}
       </NavLink>
     </div>
   );
