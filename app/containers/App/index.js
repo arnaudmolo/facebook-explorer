@@ -36,6 +36,7 @@ export default () => (
       <Route exact path="/" component={HomePage} />
       <Route exact path="/users" component={UsersPage} />
       <Route exact path="/threads" component={Threads} />
+      <Route exact path="/threads/:id" component={Threads} />
       <Route component={NotFoundPage} />
     </Switch>
   </div>

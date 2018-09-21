@@ -6,7 +6,7 @@
 
 import {
   REQUEST_THREADS,
-  REQUEST_USER,
+  REQUEST_THREAD,
   LOAD_THREADS,
   LOAD_THREAD,
   REQUEST_THREADS_ERROR,
@@ -18,9 +18,9 @@ export function requestThreads() {
   };
 }
 
-export function requestUser(threadId) {
+export function requestThread(threadId) {
   return {
-    type: REQUEST_USER,
+    type: REQUEST_THREAD,
     payload: threadId,
   };
 }
@@ -32,7 +32,7 @@ export function loadedThreads(threads) {
   };
 }
 
-export function loadedUser(thread) {
+export function loadedThread(thread) {
   return {
     type: LOAD_THREAD,
     payload: thread,

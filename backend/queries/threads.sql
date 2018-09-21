@@ -63,3 +63,28 @@ VALUES
         ({{user.id|guards.integer}}, {{thread_id|guards.integer}}),
     {% endfor %}
 {% endquery %}
+
+{% query 'get_details' %}
+    SELECT 
+        threads.id AS threads_id,
+        threads.title AS threads_title,
+        threads.is_still_participant AS threads_is_still_participant,
+        threads.status AS threads_status,
+        threads.thread_type AS threads_thread_type,
+        threads.thread_path AS threads_thread_path,
+
+        messages.id AS messages_id,
+        messages.content AS messages_content,
+        messages.timestamp AS messages_timestamp,
+        messages.UserId AS messages_UserId,
+
+        users.id AS users_id,
+        users.name AS users_name
+
+        FROM threads
+        JOIN userthread ON userthread.ThreadId = threads.id
+        JOIN users ON users.id = userthread.UserId
+        JOIN messages ON threads.id = messages.ThreadId
+    WHERE 
+        threads.id = {{id|guards.integer}}
+{% endquery %}

@@ -45,8 +45,12 @@ export default class HomePage extends React.PureComponent {
           </Col>
         </Row>
         <Row>
-          <Widget url="//localhost:5002/threads?count=10" />
-          <Widget url="//localhost:5002/threads?count=10&order=own" />
+          <Col>
+            <Widget url="//localhost:5002/threads?count=10" />
+          </Col>
+          <Col>
+            <Widget url="//localhost:5002/threads?count=10&order=own" />
+          </Col>
         </Row>
       </Container>
     );

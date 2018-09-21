@@ -12,17 +12,25 @@ export const initialState = fromJS({
   users: [],
 });
 
-const insertLoadedUser = (state, user) =>
-  state.update(state.findIndex(item => item.get('id') === user.id), item =>
-    item.set('messages', user.messages).set('threads', user.threads),
-  );
+// const insertLoadedUser = (state, user) =>
+//   ;
 
 function usersReducer(state = initialState, action) {
   switch (action.type) {
     case LOAD_USER:
       return state.set(
         'users',
-        insertLoadedUser(state.get('users'), action.payload),
+        state
+          .get('users')
+          .update(
+            state
+              .get('users')
+              .findIndex(item => item.get('id') === action.payload.id),
+            item =>
+              item
+                .set('messages', fromJS(action.payload.messages))
+                .set('threads', fromJS(action.payload.threads)),
+          ),
       );
     case REQUEST_USERS:
       return state.set('loading', true);
