@@ -11,7 +11,9 @@ function User(props) {
       <ListGroup>
         {props.user.threads.map(thread => (
           <ListGroupItem className="widget-group-item" key={thread.thread_path}>
-            <ConversationTitle>{thread.title}</ConversationTitle>
+            <ConversationTitle to={`/threads/${thread.id}`}>
+              {thread.title}
+            </ConversationTitle>
             {thread.meta && (
               <PieChart width={20} height={20} values={thread.meta} />
             )}

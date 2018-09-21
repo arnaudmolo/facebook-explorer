@@ -20,6 +20,7 @@ import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Users from 'containers/Users';
 import Sidebar from 'components/Sidebar';
 import UsersPage from 'components/UsersPage';
+import Threads from 'containers/Threads';
 
 import './styles.css';
 
@@ -34,6 +35,8 @@ export default () => (
     <Switch>
       <Route exact path="/" component={HomePage} />
       <Route exact path="/users" component={UsersPage} />
+      <Route exact path="/threads" component={Threads} />
+      <Route exact path="/threads/:id" component={Threads} />
       <Route component={NotFoundPage} />
     </Switch>
   </div>

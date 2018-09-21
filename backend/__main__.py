@@ -21,6 +21,14 @@ def countby(f, seq):
             result[key] = 1
     return result
 
+def sort_group (f, seq): 
+    return groupby(
+        sorted(seq, key = f), key = f
+    )
+
+def head (seq):
+    return seq[0]
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 api = Api(app)
@@ -61,13 +69,13 @@ class Threads(Resource):
             )))
 
             return [
-                (id, title, is_still_participant, status, thread_type, thread_path, total, own)
-                for (id, title, is_still_participant, status, thread_type, thread_path, total), (_, own) in zip(
+                (id, title, is_still_participant, status, thread_type, thread_path, {'rest': total - own, ownid:own})
+                for (id, title, is_still_participant, status, thread_type, thread_path, total), (ownid, own) in zip(
                     cursor.fetchall(),
                     top_map_id_thrad
                 )
             ]
-
+    
         cursor.execute(
             threads_queries.get_all(**dict(
                 limit = limit,
@@ -76,13 +84,83 @@ class Threads(Resource):
         )
 
         return [
-            (id, title, is_still_participant, status, thread_type, thread_path, total, map_id_nb_message[id])
+            (id, title, is_still_participant, status, thread_type, thread_path, {
+                'test': total - map_id_nb_message.get(id, 0), id: map_id_nb_message.get(id, 0)
+            })
             for id, title, is_still_participant, status, thread_type, thread_path, total in cursor.fetchall()
         ]
 
 class Thread(Resource):
     def get(self, thread_id):
-        print('thread')
+        co = create_connection()
+        cursor = co.cursor()
+
+        query_indexes = [
+            'threads_id',
+            'threads_title',
+            'threads_is_still_participant',
+            'threads_status',
+            'threads_thread_type',
+            'threads_thread_path',
+            'messages_id',
+            'messages_content',
+            'messages_timestamp',
+            'messages_UserId',
+            'users_id',
+            'users_name'
+        ]
+
+        cursor.execute(
+            threads_queries.get_details(**dict(id=thread_id))
+        )
+        raw = cursor.fetchall()
+        res = list(map(
+            lambda row: dict(zip(query_indexes, row)),
+            raw
+        ))
+
+        def row_to_user (row):
+            return list(dict(
+                id = row['users_id'],
+                name = row['users_name']
+            ).values())
+        
+        def row_to_message (row):
+            return list(dict(
+                id = row['messages_id'],
+                content = row['messages_content'],
+                timestamp = row['messages_timestamp'].isoformat(),
+                UserId = row['messages_UserId'],
+            ).values())
+        
+        users = []
+        messages = []
+        seen_message = set()
+        seen_user = set()
+        for row in res:
+            message_id = row['messages_id']
+            if message_id not in seen_message:
+                seen_message.add(message_id)
+                messages.append(row_to_message(row))
+
+            user_id = row['users_id']
+            if user_id not in seen_user:
+                seen_user.add(user_id)
+                users.append(row_to_user(row))
+
+        thread = dict(
+            zip(
+                query_indexes[:6],
+                head(raw)
+            ),
+            meta = countby(
+                lambda row: row[3],
+                messages
+            ),
+            users = users,
+            messages = messages
+        )
+        return list(thread.values())
 
 class Users(Resource):
     def get(self):
@@ -95,7 +173,7 @@ class Users(Resource):
         user_id_accessor = itemgetter(0)
 
         res3 = []
-        for user_id, grouped_relations in groupby(sorted(res, key = user_id_accessor), key = user_id_accessor):
+        for user_id, grouped_relations in sort_group(user_id_accessor, res):
             grouped_relations = list(grouped_relations)
             (id, name, fb_id, *tail) = grouped_relations[0]
             res3.append(
@@ -128,7 +206,7 @@ class User(Resource):
         thread_id_accessor = itemgetter(2)
         message_user_accessor = itemgetter(4)
 
-        for thread_id, grouped_threads in groupby(sorted(rows, key = thread_id_accessor), key = thread_id_accessor):
+        for thread_id, grouped_threads in sort_group(thread_id_accessor, rows):
             t2 = list(v for v in grouped_threads)
             thread_messages = [ (message_id, threads_id, message_content, message_date.isoformat(), message_user_id) for (
                 users_id,
