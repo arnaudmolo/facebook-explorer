@@ -57,8 +57,13 @@ export function* getThreads() {
   }
 }
 
+let once = false;
 // Individual exports for testing
 export default function* defaultSaga() {
+  if (once) {
+    return;
+  }
+  once = true;
   // See example in containers/HomePage/saga.js
   yield takeLatest(REQUEST_THREADS, getThreads);
   yield takeLatest(REQUEST_THREAD, getThread);
