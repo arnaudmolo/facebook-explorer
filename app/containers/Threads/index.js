@@ -14,6 +14,7 @@ import { Container, Row, Col } from 'reactstrap';
 import { Route } from 'react-router-dom';
 import { scaleOrdinal } from 'd3';
 import { head } from 'ramda';
+import { FormattedMessage } from 'react-intl';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
@@ -21,11 +22,11 @@ import Widget from 'components/Widget';
 import makeSelectThreads from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-// import messages from './messages';
+import messages from './messages';
 import { requestThreads, requestThread } from './actions';
 import Linechart from '../../components/Linechart';
 
-import { orderByDate } from './mapDataToStack';
+import { agregateByHours, orderByDate } from './mapDataToStack';
 
 const mapStateToProps = makeSelectThreads();
 
@@ -125,10 +126,24 @@ const Thread = compose(
               </li>
             ))}
           </ul>
+          <h1>
+            <FormattedMessage {...messages.vizByHourTitle} />
+          </h1>
           <Linechart
             ids={usersId}
-            width={600}
-            height={100}
+            width={700}
+            height={300}
+            data={agregateByHours(d => d.datetime, usersId)(
+              props.thread.messages,
+            )}
+          />
+          <h1>
+            <FormattedMessage {...messages.vizMessageByDay} />
+          </h1>
+          <Linechart
+            ids={usersId}
+            width={700}
+            height={300}
             data={orderByDate(d => d.datetime, usersId)(props.thread.messages)}
           />
         </div>

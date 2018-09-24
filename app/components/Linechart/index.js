@@ -47,10 +47,10 @@ function Linechart(props) {
   const zoom = zoomCreator().scaleExtent([1, 18]);
 
   const margins = {
-    top: 10,
+    top: 15,
     right: 0,
-    bottom: 0,
-    left: 0,
+    bottom: 24,
+    left: 35,
   };
 
   // const ids = uniq(props.data.map(messages => messages.userId));
@@ -112,21 +112,23 @@ function Linechart(props) {
             fill={color(i)}
           />
         ))}
-        <g
-          ref={element => {
-            if (element) {
-              xAxisElement = select(element).call(xAxis);
-            }
-          }}
-        />
-        <g
-          ref={element => {
-            if (element) {
-              select(element).call(axisLeft(yScale));
-            }
-          }}
-        />
       </g>
+      <g
+        transform={`translate(${margins.left}, ${height - margins.bottom})`}
+        ref={element => {
+          if (element) {
+            xAxisElement = select(element).call(xAxis);
+          }
+        }}
+      />
+      <g
+        transform={`translate(${margins.left}, ${margins.top})`}
+        ref={element => {
+          if (element) {
+            select(element).call(axisLeft(yScale));
+          }
+        }}
+      />
       <rect
         ref={element => {
           if (element) {
