@@ -8,10 +8,20 @@ const parse = compose(
   thread => ({
     ...thread,
     title: decodeURIComponent(escape(thread.title)),
-    users: thread.users.map(([id, username]) => [
-      id,
-      decodeURIComponent(escape(username)),
-    ]),
+    users:
+      thread.users &&
+      thread.users.map(([id, username]) => [
+        id,
+        decodeURIComponent(escape(username)),
+      ]),
+    messages:
+      thread.messages &&
+      thread.messages.map(([id, content, datetime, userId]) => ({
+        id,
+        content,
+        datetime: new Date(datetime),
+        userId,
+      })),
   }),
   zipObj([
     'id',

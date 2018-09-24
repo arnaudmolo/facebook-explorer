@@ -12,6 +12,7 @@ import { compose } from 'redux';
 import { lifecycle, withProps } from 'recompose';
 import { Container, Row, Col } from 'reactstrap';
 import { Route } from 'react-router-dom';
+import { scaleOrdinal } from 'd3';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
@@ -21,6 +22,7 @@ import reducer from './reducer';
 import saga from './saga';
 // import messages from './messages';
 import { requestThreads, requestThread } from './actions';
+import Linechart from '../../components/Linechart';
 
 const mapStateToProps = makeSelectThreads();
 
@@ -65,6 +67,24 @@ export default compose(
   }),
 )(Threads);
 
+const color = scaleOrdinal().range([
+  '#be5926',
+  '#686cc8',
+  '#57b14b',
+  '#ae56c2',
+  '#a6b447',
+  '#ce4685',
+  '#52ae88',
+  '#d64546',
+  '#5b9ed4',
+  '#df8b30',
+  '#c681bd',
+  '#c49c40',
+  '#aa5159',
+  '#6d7631',
+  '#d88c6c',
+]);
+
 const Thread = compose(
   withConnect,
   lifecycle({
@@ -93,14 +113,15 @@ const Thread = compose(
         <div>
           <h1>{props.thread.title}</h1>
           <ul>
-            {props.thread.users.map(([id, user]) => (
-              <li key={id}>
+            {props.thread.users.map(([id, user], index) => (
+              <li style={{ backgroundColor: color(index) }} key={id}>
                 {user}{' '}
                 {props.thread.meta[id] &&
                   `posted ${props.thread.meta[id]} messages`}
               </li>
             ))}
           </ul>
+          <Linechart width={800} height={500} data={props.thread.messages} />
         </div>
       );
     }

@@ -102,16 +102,16 @@ def register_thread (url):
         user = dict(
             name = message.get('sender_name', 'unknow user'),
             fb_id = 'null',
-            timestamp = datetime.now(),
+            timestamp = datetime.fromtimestamp(message.get('timestamp')),
             friendship = status
         )
         try:
             user = create_user(user)
-        except Exception as error:
+        except Exception:
             user = find_user(user)
         messages_to_save.append(dict(
             content = message.get('content', 'Empty Content'),
-            timestamp = datetime.now(),
+            timestamp = datetime.fromtimestamp(message.get('timestamp')),
             type = message['type'],
             UserId = user['id'],
             ThreadId = thread_id
