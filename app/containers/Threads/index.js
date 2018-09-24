@@ -13,6 +13,7 @@ import { lifecycle, withProps } from 'recompose';
 import { Container, Row, Col } from 'reactstrap';
 import { Route } from 'react-router-dom';
 import { scaleOrdinal } from 'd3';
+import { head } from 'ramda';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
@@ -23,6 +24,8 @@ import saga from './saga';
 // import messages from './messages';
 import { requestThreads, requestThread } from './actions';
 import Linechart from '../../components/Linechart';
+
+import { orderByDate } from './mapDataToStack';
 
 const mapStateToProps = makeSelectThreads();
 
@@ -109,6 +112,7 @@ const Thread = compose(
       </div>
     );
     if (props.thread.users) {
+      const usersId = props.thread.users.map(head);
       content = (
         <div>
           <h1>{props.thread.title}</h1>
@@ -121,7 +125,12 @@ const Thread = compose(
               </li>
             ))}
           </ul>
-          <Linechart width={800} height={500} data={props.thread.messages} />
+          <Linechart
+            ids={usersId}
+            width={600}
+            height={100}
+            data={orderByDate(d => d.datetime, usersId)(props.thread.messages)}
+          />
         </div>
       );
     }
