@@ -13,7 +13,7 @@ import { lifecycle, withProps } from 'recompose';
 import { Container, Row, Col } from 'reactstrap';
 import { Route } from 'react-router-dom';
 import { scaleOrdinal } from 'd3';
-import { head, countBy, pipe, mapObjIndexed, sort, values } from 'ramda';
+import { head } from 'ramda';
 import { FormattedMessage } from 'react-intl';
 
 import injectSaga from 'utils/injectSaga';
@@ -113,14 +113,6 @@ const Thread = compose(
       </div>
     );
     if (props.thread.users) {
-      console.log(
-        pipe(
-          countBy(c => c),
-          mapObjIndexed((u, m) => [m, u]),
-          values,
-          sort((a, b) => b[1] - a[1]),
-        )(props.thread.messages.reduce((s, m) => s + m.content).split(' ')),
-      );
       const usersId = props.thread.users.map(head);
       content = (
         <div>

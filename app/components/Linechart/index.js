@@ -43,18 +43,24 @@ const color = scaleOrdinal().range([
 ]);
 
 function Linechart(props) {
-  const { width, height } = props;
-  const zoom = zoomCreator().scaleExtent([1, 18]);
+  const {
+    width,
+    height,
+    margins = {
+      top: 15,
+      right: 0,
+      bottom: 24,
+      left: 35,
+    },
+  } = props;
 
-  const margins = {
-    top: 15,
-    right: 0,
-    bottom: 24,
-    left: 35,
-  };
+  const zoom = zoomCreator()
+    .scaleExtent([1, 18])
+    .translateExtent([[-width, -Infinity], [2 * width, Infinity]])
+    .on('zoom', zoomed);
 
-  // const ids = uniq(props.data.map(messages => messages.userId));
   const stack = stackCreator().keys(props.ids);
+
   const area = areaCreator()
     .curve(curveStep)
     .x(d => xScale(d.data.timestamp))
@@ -69,25 +75,16 @@ function Linechart(props) {
           : true,
     );
 
-  const pointList = props.data;
-
   const xScale = scaleTime()
     .rangeRound([0, width - margins.left - margins.right])
-    .domain(extent(pointList, d => d.timestamp));
-
+    .domain(extent(props.data, d => d.timestamp));
   const yScale = scaleLinear()
     .range([height - margins.top - margins.bottom, 0])
-    .domain([0, max(pointList, d => sum(props.ids.map(id => d[id])))]);
-
-  zoom
-    .translateExtent([[-width, -Infinity], [2 * width, Infinity]])
-    .on('zoom', zoomed);
+    .domain([0, max(props.data, d => sum(props.ids.map(id => d[id])))]);
 
   let xAxisElement;
-
   const xAxis = axisBottom(xScale);
-  const stacked = stack(pointList);
-
+  const stacked = stack(props.data);
   const refs = {};
   function zoomed() {
     const xz = d3event.transform.rescaleX(xScale);
@@ -95,7 +92,6 @@ function Linechart(props) {
     area.x(d => xz(d.data.timestamp));
     forEachObjIndexed((ref, key) => ref.attr('d', area(stacked[key])))(refs);
   }
-
   return (
     <svg width={width} height={height}>
       <g transform={`translate(${margins.left}, ${margins.top})`}>
@@ -149,6 +145,7 @@ Linechart.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   ids: PropTypes.arrayOf(String),
+  margins: PropTypes.object,
 };
 
 export default Linechart;
