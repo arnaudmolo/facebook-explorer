@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Users from 'containers/Users';
 import fuzzyFilterFactory from 'react-fuzzy-filter';
 import PropTypes from 'prop-types';
@@ -35,97 +35,89 @@ const fuseConfig = {
   keys: ['name'],
 };
 
-class UsersPage extends React.PureComponent {
-  static propTypes = {
-    users: PropTypes.array,
-    requestUser: PropTypes.func,
-  };
+const UsersPage = props => {
+  const [checkedStatus, setCheckedStatus] = useState(
+    friendshipStatus.filter(e => e === 'friend' || e === 'own'),
+  );
+  const [user, setUser] = useState({});
 
-  state = {
-    checkedStatus: friendshipStatus.filter(e => e === 'friend' || e === 'own'),
-    user: {},
-  };
-
-  onChange = event => {
+  const onChange = event => {
     if (!event.target.checked) {
-      return this.setState({
-        checkedStatus: this.state.checkedStatus.filter(
-          status => status !== event.target.value,
-        ),
-      });
+      setCheckedStatus(
+        checkedStatus.filter(status => status !== event.target.value),
+      );
+    } else {
+      setCheckedStatus([...checkedStatus, event.target.value]);
     }
-    return this.setState({
-      checkedStatus: [...this.state.checkedStatus, event.target.value],
-    });
   };
 
-  selectUser = user => () => {
-    this.props.requestUser(user.id);
-    this.setState({ user });
+  const selectUser = u => () => {
+    props.requestUser(user.id);
+    setUser(u);
   };
+  const selected = user.id && props.users.find(_user => _user.id === user.id);
+  return (
+    <Container>
+      <Row>
+        <Col>
+          <Form>
+            <FormGroup check>
+              {friendshipStatus.map(status => (
+                <Label key={status} check>
+                  <Input
+                    type="checkbox"
+                    value={status}
+                    onChange={onChange}
+                    checked={checkedStatus.includes(status)}
+                  />{' '}
+                  <p>
+                    <FormattedMessage {...messages[status]} />
+                  </p>
+                </Label>
+              ))}
+            </FormGroup>
+          </Form>
+          {props.users.length && (
+            <div className="container">
+              <InputFilter
+                debounceTime={200}
+                inputProps={{
+                  className: 'form-control',
+                  placeholder: 'Type a name',
+                }}
+              />
+              <FilterResults
+                items={props.users.filter(_user =>
+                  _user.relations.some(relation =>
+                    checkedStatus.includes(relation.friendship),
+                  ),
+                )}
+                fuseConfig={fuseConfig}
+              >
+                {filteredItems => (
+                  <div>
+                    {filteredItems.map(item => (
+                      <div key={item.name}>
+                        <button onClick={selectUser(item)}>
+                          {item.name} {scale(item.relation)}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </FilterResults>
+            </div>
+          )}
+        </Col>
+        <Col>{user.id && <User user={selected} />}</Col>
+      </Row>
+    </Container>
+  );
+};
 
-  render() {
-    const selected =
-      this.state.user.id &&
-      this.props.users.find(user => user.id === this.state.user.id);
-    return (
-      <Container>
-        <Row>
-          <Col>
-            <Form>
-              <FormGroup check>
-                {friendshipStatus.map(status => (
-                  <Label key={status} check>
-                    <Input
-                      type="checkbox"
-                      value={status}
-                      onChange={this.onChange}
-                      checked={this.state.checkedStatus.includes(status)}
-                    />{' '}
-                    <p>
-                      <FormattedMessage {...messages[status]} />
-                    </p>
-                  </Label>
-                ))}
-              </FormGroup>
-            </Form>
-            {this.props.users.length && (
-              <div className="container">
-                <InputFilter
-                  debounceTime={200}
-                  inputProps={{
-                    className: 'form-control',
-                    placeholder: 'Type a name',
-                  }}
-                />
-                <FilterResults
-                  items={this.props.users.filter(user =>
-                    user.relations.some(relation =>
-                      this.state.checkedStatus.includes(relation.friendship),
-                    ),
-                  )}
-                  fuseConfig={fuseConfig}
-                >
-                  {filteredItems => (
-                    <div>
-                      {filteredItems.map(item => (
-                        <div key={item.name}>
-                          <button onClick={this.selectUser(item)}>
-                            {item.name} {scale(item.relation)}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </FilterResults>
-              </div>
-            )}
-          </Col>
-          <Col>{this.state.user.id && <User user={selected} />}</Col>
-        </Row>
-      </Container>
-    );
-  }
-}
+UsersPage.propTypes = {
+  users: PropTypes.array,
+  requestUser: PropTypes.func,
+};
 
 export default Users(UsersPage);

@@ -4,12 +4,12 @@
  *
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import request from 'utils/request';
 import ConversationTitle from 'components/ConversationTitle';
 import PieChart from 'components/PieChart';
 import { ListGroup, ListGroupItem } from 'reactstrap';
-import { lifecycle, withState, compose, branch } from 'recompose';
 import { zipObj, map } from 'ramda';
 import './styles.css';
 
@@ -24,37 +24,36 @@ const zip = zipObj([
   'meta',
 ]);
 
-const withAsync = branch(
-  props => props.url,
-  compose(
-    withState('threads', 'setThreads', []),
-    lifecycle({
-      async componentWillMount() {
-        this.props.setThreads(await request(this.props.url).then(map(zip)));
-      },
-    }),
-  ),
-);
+const Widget = props => {
+  const { url } = props;
 
-/* eslint-disable react/prefer-stateless-function */
-class Widget extends React.PureComponent {
-  render(props = this.props) {
-    const { threads } = props;
-    return (
-      <ListGroup>
-        {threads.map(thread => (
-          <ListGroupItem className="widget-group-item" key={thread.thread_path}>
-            <ConversationTitle to={`/threads/${thread.id}`}>
-              {thread.title}
-            </ConversationTitle>
-            {thread.meta && (
-              <PieChart width={20} height={20} values={thread.meta} />
-            )}
-          </ListGroupItem>
-        ))}
-      </ListGroup>
-    );
-  }
-}
+  const [threads, setThreads] = useState([]);
 
-export default withAsync(Widget);
+  useEffect(
+    async () => {
+      setThreads(await request(url).then(map(zip)));
+    },
+    [url],
+  );
+
+  return (
+    <ListGroup>
+      {threads.map(thread => (
+        <ListGroupItem className="widget-group-item" key={thread.thread_path}>
+          <ConversationTitle to={`/threads/${thread.id}`}>
+            {thread.title}
+          </ConversationTitle>
+          {thread.meta && (
+            <PieChart width={20} height={20} values={thread.meta} />
+          )}
+        </ListGroupItem>
+      ))}
+    </ListGroup>
+  );
+};
+
+Widget.propTypes = {
+  url: PropTypes.string,
+};
+
+export default Widget;

@@ -17,42 +17,39 @@ import { Jumbotron, Container, Row, Col } from 'reactstrap';
 import messages from './messages';
 import './styles.css';
 
-/* eslint-disable react/prefer-stateless-function */
-export default class HomePage extends React.PureComponent {
-  render() {
-    return (
-      <Container>
-        <Row>
-          <Jumbotron>
-            <h1 className="display-3">
-              <FormattedMessage {...messages.header} />
-            </h1>
-            <p className="lead">
-              <FormattedMessage {...messages.lead} />
-            </p>
-          </Jumbotron>
-        </Row>
-        <Row>
-          <Col>
-            <h2>
-              <FormattedMessage {...messages.mostMessages} />
-            </h2>
-          </Col>
-          <Col>
-            <h2>
-              <FormattedMessage {...messages.myMessages} />
-            </h2>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Widget url="//localhost:5002/threads?count=10" />
-          </Col>
-          <Col>
-            <Widget url="//localhost:5002/threads?count=10&order=own" />
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
-}
+const HomePage = () => (
+  <Container>
+    <Row>
+      <Jumbotron>
+        <h1 className="display-3">
+          <FormattedMessage {...messages.header} />
+        </h1>
+        <p className="lead">
+          <FormattedMessage {...messages.lead} />
+        </p>
+      </Jumbotron>
+    </Row>
+    <Row>
+      <Col>
+        <h2>
+          <FormattedMessage {...messages.mostMessages} />
+        </h2>
+      </Col>
+      <Col>
+        <h2>
+          <FormattedMessage {...messages.myMessages} />
+        </h2>
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+        <Widget url="//localhost:5002/threads?count=10" />
+      </Col>
+      <Col>
+        <Widget url="//localhost:5002/threads?count=10&order=own" />
+      </Col>
+    </Row>
+  </Container>
+);
+
+export default HomePage;
