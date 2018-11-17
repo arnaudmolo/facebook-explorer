@@ -9,13 +9,40 @@
  * the linting exception.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Widget from 'components/Widget';
 import { FormattedMessage } from 'react-intl';
 import { Jumbotron, Container, Row, Col } from 'reactstrap';
-
+import { map, zipObj } from 'ramda';
+import { mapProps } from 'recompose';
+import request from 'utils/request';
 import messages from './messages';
 import './styles.css';
+
+const zip = zipObj([
+  'id',
+  'title',
+  'is_still_participant',
+  'status',
+  'thread_type',
+  'thread_path',
+  'meta',
+]);
+
+const useLoadUrl = url => {
+  const [threads, setThreads] = useState([]);
+  useEffect(
+    async () => {
+      setThreads(await request(url).then(map(zip)));
+    },
+    [url],
+  );
+  return threads;
+};
+
+const WidgetByUrl = mapProps(props => ({
+  threads: useLoadUrl(props.url),
+}))(Widget);
 
 const HomePage = () => (
   <Container>
@@ -43,10 +70,10 @@ const HomePage = () => (
     </Row>
     <Row>
       <Col>
-        <Widget url="//localhost:5002/threads?count=10" />
+        <WidgetByUrl url="//localhost:5002/threads?count=10" />
       </Col>
       <Col>
-        <Widget url="//localhost:5002/threads?count=10&order=own" />
+        <WidgetByUrl url="//localhost:5002/threads?count=10&order=own" />
       </Col>
     </Row>
   </Container>

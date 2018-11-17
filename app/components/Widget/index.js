@@ -4,38 +4,17 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import request from 'utils/request';
 import ConversationTitle from 'components/ConversationTitle';
 import PieChart from 'components/PieChart';
 import { ListGroup, ListGroupItem } from 'reactstrap';
-import { zipObj, map } from 'ramda';
 import './styles.css';
 
 // import styled from 'styled-components';
-const zip = zipObj([
-  'id',
-  'title',
-  'is_still_participant',
-  'status',
-  'thread_type',
-  'thread_path',
-  'meta',
-]);
 
 const Widget = props => {
-  const { url } = props;
-
-  const [threads, setThreads] = useState([]);
-
-  useEffect(
-    async () => {
-      setThreads(await request(url).then(map(zip)));
-    },
-    [url],
-  );
-
+  const { threads } = props;
   return (
     <ListGroup>
       {threads.map(thread => (
@@ -53,7 +32,7 @@ const Widget = props => {
 };
 
 Widget.propTypes = {
-  url: PropTypes.string,
+  threads: PropTypes.array,
 };
 
 export default Widget;
