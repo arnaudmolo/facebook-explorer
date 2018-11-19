@@ -19,21 +19,23 @@ import request from 'utils/request';
 import messages from './messages';
 import './styles.css';
 
-const zip = zipObj([
-  'id',
-  'title',
-  'is_still_participant',
-  'status',
-  'thread_type',
-  'thread_path',
-  'meta',
-]);
+const parse = map(
+  zipObj([
+    'id',
+    'title',
+    'is_still_participant',
+    'status',
+    'thread_type',
+    'thread_path',
+    'meta',
+  ]),
+);
 
 const useLoadUrl = url => {
   const [threads, setThreads] = useState([]);
   useEffect(
     async () => {
-      setThreads(await request(url).then(map(zip)));
+      setThreads(await request(url).then(parse));
     },
     [url],
   );

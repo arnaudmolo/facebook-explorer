@@ -14,7 +14,7 @@ import { Route } from 'react-router-dom';
 import { scaleOrdinal } from 'd3';
 import { head } from 'ramda';
 import { FormattedMessage } from 'react-intl';
-import { mapProps } from 'recompose';
+import { withProps } from 'recompose';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
@@ -46,7 +46,7 @@ function Threads(props) {
         <Col xs="3">
           <Widget threads={threads} />
         </Col>
-        <Col>
+        <Col xs="9">
           <Route path="/threads/:id" component={Thread} />
         </Col>
       </Row>
@@ -62,7 +62,7 @@ export default compose(
   withReducer,
   withSaga,
   withConnect,
-  mapProps(props => {
+  withProps(props => {
     useEffect(
       () => {
         if (!props.loading) {
@@ -71,7 +71,6 @@ export default compose(
       },
       [props.loading],
     );
-    return props;
   }),
 )(Threads);
 

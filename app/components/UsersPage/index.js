@@ -36,26 +36,22 @@ const fuseConfig = {
 };
 
 const UsersPage = props => {
+  const [user, setUser] = useState({});
   const [checkedStatus, setCheckedStatus] = useState(
     friendshipStatus.filter(e => e === 'friend' || e === 'own'),
   );
-  const [user, setUser] = useState({});
-
+  const selected = user.id && props.users.find(_user => _user.id === user.id);
   const onChange = event => {
-    if (!event.target.checked) {
-      setCheckedStatus(
-        checkedStatus.filter(status => status !== event.target.value),
-      );
-    } else {
-      setCheckedStatus([...checkedStatus, event.target.value]);
-    }
+    setCheckedStatus(
+      event.target.checked
+        ? [...checkedStatus, event.target.value]
+        : checkedStatus.filter(status => status !== event.target.value),
+    );
   };
-
   const selectUser = u => () => {
-    props.requestUser(user.id);
+    props.requestUser(u.id);
     setUser(u);
   };
-  const selected = user.id && props.users.find(_user => _user.id === user.id);
   return (
     <Container>
       <Row>

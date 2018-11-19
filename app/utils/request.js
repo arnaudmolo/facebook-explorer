@@ -40,7 +40,7 @@ function checkStatus(response) {
  * @return {object}           The response data
  */
 export default function request(url, options) {
-  if (url === undefined) {
+  if (!url) {
     throw new Error("url can't be null");
   }
   return fetch(url, options)

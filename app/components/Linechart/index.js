@@ -22,7 +22,13 @@ import {
 import { axisBottom, axisLeft } from 'd3-axis';
 
 import { forEachObjIndexed, sum } from 'ramda';
+
 const ONE_DAY = 86400000;
+const whenElement = callback => element => {
+  if (element) {
+    callback(element);
+  }
+};
 
 const color = scaleOrdinal().range([
   '#be5926',
@@ -54,11 +60,6 @@ function Linechart(props) {
     },
   } = props;
 
-  const zoom = zoomCreator()
-    .scaleExtent([1, 18])
-    .translateExtent([[-width, -Infinity], [2 * width, Infinity]])
-    .on('zoom', zoomed);
-
   const stack = stackCreator().keys(props.ids);
 
   const area = areaCreator()
@@ -86,22 +87,25 @@ function Linechart(props) {
   const xAxis = axisBottom(xScale);
   const stacked = stack(props.data);
   const refs = {};
-  function zoomed() {
-    const xz = d3event.transform.rescaleX(xScale);
-    xAxisElement.call(xAxis.scale(xz));
-    area.x(d => xz(d.data.timestamp));
-    forEachObjIndexed((ref, key) => ref.attr('d', area(stacked[key])))(refs);
-  }
+
+  const zoom = zoomCreator()
+    .scaleExtent([1, 18])
+    .translateExtent([[-width, -Infinity], [2 * width, Infinity]])
+    .on('zoom', () => {
+      const xz = d3event.transform.rescaleX(xScale);
+      xAxisElement.call(xAxis.scale(xz));
+      area.x(d => xz(d.data.timestamp));
+      forEachObjIndexed((ref, key) => ref.attr('d', area(stacked[key])))(refs);
+    });
+
   return (
     <svg width={width} height={height}>
       <g transform={`translate(${margins.left}, ${margins.top})`}>
         {stacked.map((data, i) => (
           <path
-            ref={element => {
-              if (element) {
-                refs[i] = select(element);
-              }
-            }}
+            ref={whenElement(element => {
+              refs[i] = select(element);
+            })}
             key={props.ids[i]}
             fillOpacity="1"
             d={area(data)}
@@ -111,26 +115,18 @@ function Linechart(props) {
       </g>
       <g
         transform={`translate(${margins.left}, ${height - margins.bottom})`}
-        ref={element => {
-          if (element) {
-            xAxisElement = select(element).call(xAxis);
-          }
-        }}
+        ref={whenElement(element => {
+          xAxisElement = select(element).call(xAxis);
+        })}
       />
       <g
         transform={`translate(${margins.left}, ${margins.top})`}
-        ref={element => {
-          if (element) {
-            select(element).call(axisLeft(yScale));
-          }
-        }}
+        ref={whenElement(element => select(element).call(axisLeft(yScale)))}
       />
       <rect
-        ref={element => {
-          if (element) {
-            select(element).call(zoom, zoom.transform, zoomIdentity);
-          }
-        }}
+        ref={whenElement(element =>
+          select(element).call(zoom, zoom.transform, zoomIdentity),
+        )}
         width={width}
         height={height}
         fill="none"
