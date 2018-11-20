@@ -17,13 +17,12 @@ import messages from './messages';
 function Sidebar(props) {
   const [usersList, setUsersList] = useState(false);
   const toggle = () => setUsersList(!usersList);
-
   return (
     <nav className="sidebar">
-      {props.title ? (
+      {props.own ? (
         <React.Fragment>
           <div className="sidebar-header">
-            <h3>{props.title}</h3>
+            <h3>{props.own.name}</h3>
           </div>
           <ul className="list-unstyled components">
             <li>
@@ -37,7 +36,7 @@ function Sidebar(props) {
                   <FormattedMessage {...messages.users} />
                 </DropdownToggle>
                 <DropdownMenu>
-                  <Users />
+                  <Users {...props} />
                 </DropdownMenu>
               </Dropdown>
             </li>
@@ -63,7 +62,7 @@ function Sidebar(props) {
 }
 
 Sidebar.propTypes = {
-  title: PropTypes.string,
+  own: PropTypes.object,
 };
 
 export default memo(Sidebar);

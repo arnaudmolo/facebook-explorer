@@ -5,7 +5,6 @@
  */
 
 import React, { useState } from 'react';
-import Users from 'containers/Users';
 import fuzzyFilterFactory from 'react-fuzzy-filter';
 import PropTypes from 'prop-types';
 import { scaleOrdinal } from 'd3';
@@ -128,4 +127,4 @@ UsersPage.propTypes = {
   requestUser: PropTypes.func,
 };
 
-export default Users(UsersPage);
+export default UsersPage;
