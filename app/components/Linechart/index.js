@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 
 import { scaleTime, scaleLinear } from 'd3-scale';
@@ -20,8 +20,23 @@ import {
   curveStep,
 } from 'd3';
 import { axisBottom, axisLeft } from 'd3-axis';
-
 import { forEachObjIndexed, sum } from 'ramda';
+import styled from 'styled-components';
+
+const VizContainer = styled('div')`
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 10px 20px 10px 10px;
+  border-radius: 5px;
+  display: inline-block;
+  path {
+    border-right: 1px solid black;
+  }
+  .grid-container {
+    opacity: 0.2;
+    fill: none;
+    stroke-width: 0.5;
+  }
+`;
 
 const ONE_DAY = 86400000;
 const whenElement = callback => element => {
@@ -99,40 +114,61 @@ function Linechart(props) {
     });
 
   return (
-    <svg width={width} height={height}>
-      <g transform={`translate(${margins.left}, ${margins.top})`}>
-        {stacked.map((data, i) => (
-          <path
-            ref={whenElement(element => {
-              refs[i] = select(element);
-            })}
-            key={props.ids[i]}
-            fillOpacity="1"
-            d={area(data)}
-            fill={color(i)}
-          />
-        ))}
-      </g>
-      <g
-        transform={`translate(${margins.left}, ${height - margins.bottom})`}
-        ref={whenElement(element => {
-          xAxisElement = select(element).call(xAxis);
-        })}
-      />
-      <g
-        transform={`translate(${margins.left}, ${margins.top})`}
-        ref={whenElement(element => select(element).call(axisLeft(yScale)))}
-      />
-      <rect
-        ref={whenElement(element =>
-          select(element).call(zoom, zoom.transform, zoomIdentity),
-        )}
-        width={width}
-        height={height}
-        fill="none"
-        pointerEvents="all"
-      />
-    </svg>
+    <VizContainer>
+      <svg width={width} height={height}>
+        <g
+          className="grid-container"
+          transform={`translate(${margins.left + width}, ${margins.top})`}
+          ref={whenElement(element =>
+            select(element).call(
+              axisLeft(yScale)
+                .tickFormat('')
+                .tickSize(width),
+            ),
+          )}
+        />
+        <g
+          onMouseLeave={() =>
+            props.onDataLeave ? props.onDataLeave() : undefined
+          }
+          transform={`translate(${margins.left}, ${margins.top})`}
+        >
+          {stacked.map((data, i) => (
+            <path
+              ref={whenElement(element => {
+                refs[i] = select(element);
+              })}
+              onMouseEnter={
+                props.onDataEnter ? () => props.onDataEnter(data) : undefined
+              }
+              key={data.key}
+              className={`line-${data.key}`}
+              fillOpacity="1"
+              d={area(data)}
+              fill={color(data.key)}
+            />
+          ))}
+        </g>
+        <g
+          transform={`translate(${margins.left}, ${height - margins.bottom})`}
+          ref={whenElement(element => {
+            xAxisElement = select(element).call(xAxis);
+          })}
+        />
+        <g
+          transform={`translate(${margins.left}, ${margins.top})`}
+          ref={whenElement(element => select(element).call(axisLeft(yScale)))}
+        />
+        <rect
+          ref={whenElement(element =>
+            select(element).call(zoom, zoom.transform, zoomIdentity),
+          )}
+          width={width}
+          height={height}
+          fill="none"
+        />
+      </svg>
+    </VizContainer>
   );
 }
 
@@ -142,6 +178,8 @@ Linechart.propTypes = {
   height: PropTypes.number,
   ids: PropTypes.arrayOf(String),
   margins: PropTypes.object,
+  onDataLeave: PropTypes.func,
+  onDataEnter: PropTypes.func,
 };
 
-export default Linechart;
+export default memo(Linechart);

@@ -11,8 +11,6 @@ import PieChart from 'components/PieChart';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import './styles.css';
 
-// import styled from 'styled-components';
-
 const Widget = props => (
   <ListGroup>
     {props.threads.map(thread => (

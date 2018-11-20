@@ -4,16 +4,20 @@
  *
  */
 
-import React from 'react';
+import React, { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
-import 'reactstrap';
+import { Dropdown, DropdownMenu, DropdownToggle } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import Users from 'components/UsersPage';
 
 import './styles.css';
 import messages from './messages';
 
 function Sidebar(props) {
+  const [usersList, setUsersList] = useState(false);
+  const toggle = () => setUsersList(!usersList);
+
   return (
     <nav className="sidebar">
       {props.title ? (
@@ -22,15 +26,20 @@ function Sidebar(props) {
             <h3>{props.title}</h3>
           </div>
           <ul className="list-unstyled components">
-            <li className="active">
-              <Link to="/">
-                <FormattedMessage {...messages.home} />
-              </Link>
-            </li>
             <li>
-              <Link to="/users">
-                <FormattedMessage {...messages.users} />
-              </Link>
+              <Dropdown isOpen={usersList} toggle={toggle}>
+                <DropdownToggle
+                  tag="span"
+                  onClick={toggle}
+                  data-toggle="dropdown"
+                  aria-expanded={usersList}
+                >
+                  <FormattedMessage {...messages.users} />
+                </DropdownToggle>
+                <DropdownMenu>
+                  <Users />
+                </DropdownMenu>
+              </Dropdown>
             </li>
             <li>
               <Link to="/threads">
@@ -57,4 +66,4 @@ Sidebar.propTypes = {
   title: PropTypes.string,
 };
 
-export default Sidebar;
+export default memo(Sidebar);

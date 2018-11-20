@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import { scaleOrdinal } from 'd3';
 import { FormattedMessage } from 'react-intl';
 import { Container, Row, Col, FormGroup, Label, Input, Form } from 'reactstrap';
+import './styles.css';
 
 import User from './User';
 import messages from './messages';
@@ -18,7 +19,6 @@ import messages from './messages';
 const { InputFilter, FilterResults } = fuzzyFilterFactory();
 
 const friendshipStatus = [
-  'own',
   'friend',
   'received',
   'rejected',
@@ -27,9 +27,10 @@ const friendshipStatus = [
   'unknow',
 ];
 
-const scale = scaleOrdinal(['😀', '😘', '🖐', '🙃', '😡', '😢', '🤔']).domain(
-  friendshipStatus,
-);
+const scale = scaleOrdinal(['😀', '😘', '🖐', '🙃', '😡', '😢', '🤔']).domain([
+  'own',
+  ...friendshipStatus,
+]);
 
 const fuseConfig = {
   keys: ['name'],
@@ -41,40 +42,47 @@ const UsersPage = props => {
     friendshipStatus.filter(e => e === 'friend' || e === 'own'),
   );
   const selected = user.id && props.users.find(_user => _user.id === user.id);
-  const onChange = event => {
+  const onChange = event =>
     setCheckedStatus(
       event.target.checked
         ? [...checkedStatus, event.target.value]
         : checkedStatus.filter(status => status !== event.target.value),
     );
-  };
   const selectUser = u => () => {
     props.requestUser(u.id);
     setUser(u);
   };
   return (
-    <Container>
+    <Container style={{ width: 550 }}>
       <Row>
         <Col>
           <Form>
-            <FormGroup check>
-              {friendshipStatus.map(status => (
-                <Label key={status} check>
+            {friendshipStatus.map(status => (
+              <FormGroup
+                key={status}
+                check
+                inline
+                className="users-page__form-group"
+              >
+                <Label check>
                   <Input
                     type="checkbox"
+                    className="users-page__hidden-input"
                     value={status}
                     onChange={onChange}
                     checked={checkedStatus.includes(status)}
-                  />{' '}
-                  <p>
-                    <FormattedMessage {...messages[status]} />
-                  </p>
+                  />
+                  <FormattedMessage {...messages[status]} />
                 </Label>
-              ))}
-            </FormGroup>
+              </FormGroup>
+            ))}
           </Form>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
           {props.users.length && (
-            <div className="container">
+            <React.Fragment>
               <InputFilter
                 debounceTime={200}
                 inputProps={{
@@ -102,10 +110,14 @@ const UsersPage = props => {
                   </div>
                 )}
               </FilterResults>
-            </div>
+            </React.Fragment>
           )}
         </Col>
-        <Col>{user.id && <User user={selected} />}</Col>
+        {user.id && (
+          <Col>
+            <User user={selected} />
+          </Col>
+        )}
       </Row>
     </Container>
   );

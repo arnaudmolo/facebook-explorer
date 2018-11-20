@@ -5,7 +5,7 @@ import PieChart from 'components/PieChart';
 import ConversationTitle from 'components/ConversationTitle';
 
 function User(props) {
-  let content;
+  let content = 'loading';
   if (props.user.threads) {
     if (props.user.threads.length === 0) {
       content = <h5>You do not have any conversation with this person :(</h5>;
