@@ -4,17 +4,18 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
 import { compose } from 'redux';
-import { lifecycle, withProps } from 'recompose';
 import { Container, Row, Col } from 'reactstrap';
 import { Route } from 'react-router-dom';
 import { scaleOrdinal } from 'd3';
 import { head } from 'ramda';
 import { FormattedMessage } from 'react-intl';
+import { withProps, onlyUpdateForKeys } from 'recompose';
+import styled from 'styled-components';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
@@ -25,6 +26,7 @@ import saga from './saga';
 import messages from './messages';
 import { requestThreads, requestThread } from './actions';
 import Linechart from '../../components/Linechart';
+import './styles.css';
 
 import { agregateByHours, orderByDate } from './mapDataToStack';
 
@@ -41,12 +43,12 @@ const withSaga = injectSaga({ key: 'threads', saga });
 function Threads(props) {
   const { threads } = props;
   return (
-    <Container>
+    <Container fluid>
       <Row>
         <Col xs="3">
           <Widget threads={threads} />
         </Col>
-        <Col>
+        <Col xs="9">
           <Route path="/threads/:id" component={Thread} />
         </Col>
       </Row>
@@ -62,12 +64,15 @@ export default compose(
   withReducer,
   withSaga,
   withConnect,
-  lifecycle({
-    componentWillMount() {
-      if (!this.props.loading) {
-        this.props.requestThreads();
-      }
-    },
+  withProps(props => {
+    useEffect(
+      () => {
+        if (!props.loading) {
+          props.requestThreads();
+        }
+      },
+      [props.loading],
+    );
   }),
 )(Threads);
 
@@ -89,63 +94,96 @@ const color = scaleOrdinal().range([
   '#d88c6c',
 ]);
 
+const EmphasisContainer = styled('div')`
+  ${props =>
+    props.selected &&
+    `path {
+      opacity: 0.5;
+    }
+    path.line-${props.selected} {
+      opacity: 1;
+    }
+    `};
+`;
+
+const Vizs = compose(
+  memo,
+  onlyUpdateForKeys(['thread']),
+)(props => {
+  const usersId = props.thread.users.map(head);
+  return (
+    <React.Fragment>
+      <h1>
+        <FormattedMessage {...messages.vizByHourTitle} />
+      </h1>
+      <Linechart
+        ids={usersId}
+        onDataEnter={props.onMouseEnter}
+        onDataLeave={props.onMouseLeave}
+        width={700}
+        height={300}
+        data={agregateByHours(d => d.datetime, usersId)(props.thread.messages)}
+      />
+      <h1>
+        <FormattedMessage {...messages.vizMessageByDay} />
+      </h1>
+      <Linechart
+        ids={usersId}
+        onDataEnter={props.onMouseEnter}
+        onDataLeave={props.onMouseLeave}
+        width={700}
+        height={300}
+        data={orderByDate(d => d.datetime, usersId)(props.thread.messages)}
+      />
+    </React.Fragment>
+  );
+});
+
 const Thread = compose(
   withConnect,
-  lifecycle({
-    componentWillMount() {
-      this.props.requestThread(+this.props.match.params.id);
-    },
-    componentDidUpdate(newProps) {
-      if (this.props.match.params.id !== newProps.match.params.id) {
-        this.props.requestThread(+this.props.match.params.id);
-      }
-    },
-  }),
   withProps(props => ({
     thread: props.threads.find(t => t.id === +props.match.params.id),
   })),
 )(props => {
+  useEffect(
+    () => {
+      props.requestThread(+props.match.params.id);
+    },
+    [props.match.params.id],
+  );
+  const { thread } = props;
+  const [selected, setSelected] = useState(false);
   let content = <h1>Loading...</h1>;
-  if (props.thread) {
+  if (thread) {
     content = (
       <div>
-        <h1>{props.thread.title}</h1>
+        <h1>{thread.title}</h1>
       </div>
     );
-    if (props.thread.users) {
-      const usersId = props.thread.users.map(head);
+    if (thread.users) {
       content = (
         <div>
-          <h1>{props.thread.title}</h1>
-          <ul>
-            {props.thread.users.map(([id, user], index) => (
-              <li style={{ backgroundColor: color(index) }} key={id}>
-                {user}{' '}
-                {props.thread.meta[id] &&
-                  `posted ${props.thread.meta[id]} messages`}
-              </li>
+          <h1>{thread.title}</h1>
+          <div>
+            {thread.users.map(([id, user]) => (
+              <div
+                key={id}
+                onMouseEnter={() => setSelected(id)}
+                onMouseLeave={() => setSelected(false)}
+                className="threads-cartouche"
+                style={{ backgroundColor: color(id) }}
+              >
+                {user} {thread.meta[id] && `posted ${thread.meta[id]} messages`}
+              </div>
             ))}
-          </ul>
-          <h1>
-            <FormattedMessage {...messages.vizByHourTitle} />
-          </h1>
-          <Linechart
-            ids={usersId}
-            width={700}
-            height={300}
-            data={agregateByHours(d => d.datetime, usersId)(
-              props.thread.messages,
-            )}
-          />
-          <h1>
-            <FormattedMessage {...messages.vizMessageByDay} />
-          </h1>
-          <Linechart
-            ids={usersId}
-            width={700}
-            height={300}
-            data={orderByDate(d => d.datetime, usersId)(props.thread.messages)}
-          />
+          </div>
+          <EmphasisContainer selected={selected}>
+            <Vizs
+              onMouseLeave={() => setSelected(false)}
+              onMouseEnter={d => setSelected(d.key)}
+              thread={thread}
+            />
+          </EmphasisContainer>
         </div>
       );
     }

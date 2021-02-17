@@ -1,0 +1,10 @@
+.threads-cartouche {
+    display: inline-block;
+    border-radius: 5px;
+    margin: 0 2px;
+    padding: 0 5px;
+}
+
+path {
+    transition: opacity 100ms cubic-bezier(0.075, 0.82, 0.165, 1);
+}

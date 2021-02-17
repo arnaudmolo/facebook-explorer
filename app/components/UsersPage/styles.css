@@ -1,0 +1,13 @@
+.users-page__form-group {
+
+}
+
+.users-page__form-group .users-page__hidden-input {
+    display: none;
+}
+input.users-page__hidden-input[type="checkbox"]:checked+span {
+    opacity: 1;
+}
+.users-page__form-group span {
+    opacity: 0.5;
+}

@@ -3,6 +3,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 180px;
   }
 .conversation-title>p {
   display: inline;
