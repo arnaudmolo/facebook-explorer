@@ -160,7 +160,7 @@
     "ip": "1.1.5",
     "lodash": "4.17.10",
     "minimist": "1.2.0",
-    "mongoose": "^5.3.4",
+    "mongoose": "^5.7.5",
     "prop-types": "15.6.1",
     "ramda": "^0.25.0",
     "react": "16.4.1",
